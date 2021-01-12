@@ -1,0 +1,250 @@
+@import '../fonts/_fonts.css';
+@import 'variables';
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+img {
+  max-width: 100%;
+}
+
+body{
+  color: $body-color;
+  font-size: 13px;
+  font-family: 'Open Sans', sans-serif;
+}
+
+.messenger {
+  display: flex;
+  flex-direction: column;
+  
+  header{
+    height: $header-height;
+    display: flex;
+    border-bottom: 1px solid $border-color;
+    .left{
+      width: $left-sidebar-width;
+      display: flex;
+      justify-content: space-between;
+      .left-action, .right-action{
+        margin: 0 8px;
+        outline: none;
+      }
+      .right-action:active{
+        animation: pop 0.3s linear 1;
+      }
+      .left-action:active{
+        animation: pop 0.3s linear 1;
+      }
+      h2{
+        line-height: $header-height;
+        font-size: 14px;
+        font-weight: 600;
+        text-align: center;
+      }
+      button{
+        background: none;
+        line-height: $header-height;
+        border: 0 none;
+        font-size: 20px;
+        cursor: pointer;
+      }
+    }
+  
+    .content{
+      flex-grow: 1;
+      h2{
+        line-height: $header-height;
+        text-align: center;
+      }
+    }
+  
+    .right{
+      width: $right-sidebar-width;
+      .user-bar{
+        display: flex;
+        justify-content: flex-end;
+        padding: 0 10px;
+        line-height: $header-height;
+        .profile-name{
+          padding-right: 10px;
+        }
+        .profile-image{
+          line-height: $header-height;
+          img{
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            margin: 10px 0 0 0;
+          }
+        }
+      }
+    }
+  }
+
+  main {
+    display: flex;
+    height: 100%;
+    overflow: hidden;
+  
+    .sidebar-left{
+      width: $left-sidebar-width;
+      border-right: 1px solid $border-color;
+    }
+    
+    .sidebar-right{
+      border-left: 1px solid $border-color;
+      width: $right-sidebar-width;
+      .title{
+        padding: 10px;
+      }
+    }
+    
+    .content{
+      flex-grow: 1;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      .messages{
+        flex-grow: 1;
+      }
+      .messenger-input{
+        height: auto;
+        display: flex;
+        border: 1px solid $border-color;
+        .text-input{
+          flex-grow: 1;
+          textarea{
+            border: 0 none;
+            width: 100%;
+            height: 100%;
+            padding: 8px 15px;
+          }
+        }
+        .actions{
+          button.send{
+            background: $primary-color;
+            color: white;
+            border: 0 none;
+            padding: 7px 15px;
+            line-height: 50px;
+          }
+        }
+      }
+    }
+  }
+}
+
+.messages{
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  overflow-y: auto;
+  .message{
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    margin: 15px 0;
+    .message-user-image{
+      img{
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+      }
+    }
+    .message-body{
+      padding-left: 10px;
+      .message-author{
+        
+      }
+      .message-text{
+        background: $body-color;
+        color:white;
+        padding: 10px;
+        border-radius: 10px;
+      }
+    }
+    &.me{
+      justify-content: flex-start;
+      .message-body{
+        .message-text{
+          background: $primary-color;
+          color:white;
+        }
+      }
+    }
+  }
+}
+
+.channels{
+  overflow-y: auto;
+  height: 100%;
+  .channel{
+    display: flex;
+    border: 1px solid $border-color;
+    padding: 8px;
+    .user-image{
+      width: 30px;
+      img{
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+      }
+    }
+    .channel-info{
+      flex-grow: 1;
+      padding-left: 8px;
+      h2{
+        font-size: 14px;
+        font-weight: 600;
+      }
+      p {
+        font-size: 12px;
+      }
+    }
+    &.active-channel{
+      background-color: $primary-color;
+    }
+  }
+}
+
+.members{
+  .member{
+    display: flex;
+    border: 1px solid $border-color;
+    padding: 8px;
+    .user-image{
+      width: 30px;
+      img{
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+      }
+    }
+
+    .member-info{
+      flex-grow: 1;
+      padding-left: 8px;
+      h2{
+        font-size: 14px;
+      }
+      p{
+        font-size: 12px;
+      }
+    }
+  }
+}
+
+h2.title{
+  font-size: 16px;
+  font-weight: 600;
+  text-align: center;
+}
+
+@keyframes pop{
+  50%  {transform: scale(1.2);}
+}
