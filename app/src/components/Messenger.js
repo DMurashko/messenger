@@ -40,6 +40,7 @@ function Messenger() {
 		}
 		dispatch(addChannel(newChannel));
 		dispatch(setActiveChannelId(channelId));
+		console.log(channels[1].created.getTime());
 		dispatch(orderChannels());
 	}
 

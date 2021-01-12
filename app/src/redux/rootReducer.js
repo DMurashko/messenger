@@ -77,7 +77,7 @@ const rootReducer = (state = initialState, action) => {
 		case SET_ACTIVE_CHANNEL_ID:
 			return { ...state, activeChannelId: action.payload };
 		case ORDER_CHANNELS:
-			return { ...state, channels: state.channels.sort((first, second) => first.created.getSeconds - second.created.getSeconds) };
+			return { ...state, channels: state.channels.sort((first, second) => first.created.getTime() - second.created.getTime()) };
 		default: return state
 	}
 }
