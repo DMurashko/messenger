@@ -1,4 +1,4 @@
-import {ADD_CHANNEL, ADD_MESSAGE, SET_ACTIVE_CHANNEL_ID, ORDER_CHANNELS} from './types';
+import {ADD_CHANNEL, ADD_MESSAGE, SET_ACTIVE_CHANNEL_ID, ORDER_CHANNELS, UPDATE_LAST_MESSAGE} from './types';
 import avatar from '../images/avatar.jpeg';
 
 const initialState = {
@@ -77,7 +77,11 @@ const rootReducer = (state = initialState, action) => {
 		case SET_ACTIVE_CHANNEL_ID:
 			return { ...state, activeChannelId: action.payload };
 		case ORDER_CHANNELS:
-			return { ...state, channels: state.channels.sort((first, second) => first.created.getTime() - second.created.getTime()) };
+			return { ...state, channels: state.channels.sort((first, second) => second.created.getTime() - first.created.getTime()) };
+		case UPDATE_LAST_MESSAGE:
+			return { ...state, channels: state.channels.forEach((element) => {if (element._id === action.payload.channel) {
+				element.lastMessage = action.payload.lastMessage
+			}})};
 		default: return state
 	}
 }

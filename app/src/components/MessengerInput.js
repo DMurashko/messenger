@@ -2,7 +2,7 @@ import { useState } from "react";
 import {ObjectId} from '../helpers/objectid';
 import avatar from '../images/avatar.jpeg';
 import { useSelector, useDispatch } from 'react-redux';
-import { addMessage } from "../redux/actions";
+import { addMessage, updateLastMessage } from "../redux/actions";
 
 function MessengerInput() {
 	const [newMessage, setNewMessage] = useState('');
@@ -29,6 +29,7 @@ function MessengerInput() {
 			me: true
 		};
 		dispatch(addMessage(message));
+		dispatch(updateLastMessage(newMessage, activeChannelId));
 		setNewMessage('');
 	}
 
