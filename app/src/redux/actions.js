@@ -1,4 +1,4 @@
-import {ADD_CHANNEL, ADD_MESSAGE, GET_CHANNELS, GET_MESSAGES, SET_ACTIVE_CHANNEL_ID, ORDER_CHANNELS, UPDATE_LAST_MESSAGE} from './types';
+import {ADD_CHANNEL, ADD_MESSAGE, GET_CHANNELS, GET_MESSAGES, SET_ACTIVE_CHANNEL_ID, ORDER_CHANNELS, UPDATE_LAST_MESSAGE, ORDER_CHANNELS_BY_THE_LATEST_MESSAGE} from './types';
 
 export function addMessage(message) {
 	return {
@@ -45,9 +45,16 @@ export function updateLastMessage(messageBody, channelToBeUpdated) {
 		payload: {
 			lastMessage: {
 				body: messageBody,
-				created: (new Date).getDate()
+				created: (new Date).getTime()
 			},
 			channelIndex: channelToBeUpdated,
 		}
+	}
+}
+
+export function orderChannelsByTheLatestMessage(channelToBeBroughtUp) {
+	return {
+		type: ORDER_CHANNELS_BY_THE_LATEST_MESSAGE,
+		payload: channelToBeBroughtUp
 	}
 }

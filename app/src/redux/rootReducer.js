@@ -1,4 +1,4 @@
-import {ADD_CHANNEL, ADD_MESSAGE, SET_ACTIVE_CHANNEL_ID, ORDER_CHANNELS, UPDATE_LAST_MESSAGE} from './types';
+import {ADD_CHANNEL, ADD_MESSAGE, SET_ACTIVE_CHANNEL_ID, ORDER_CHANNELS, UPDATE_LAST_MESSAGE, ORDER_CHANNELS_BY_THE_LATEST_MESSAGE} from './types';
 import avatar from '../images/avatar.jpeg';
 
 function updateItemInArray(array, itemId, updateItemCallback) {
@@ -86,6 +86,8 @@ const initialState = {
 	]
 }
 
+
+
 // Pure Functions
 const rootReducer = (state = initialState, action) => {
 	switch (action.type) {
@@ -102,6 +104,8 @@ const rootReducer = (state = initialState, action) => {
 				return { ...channel, lastMessage: action.payload.lastMessage}
 			});
 			return { ...state, channels: newChannels };
+		case ORDER_CHANNELS_BY_THE_LATEST_MESSAGE:
+			return { ...state, channels: state.channels.sort((first, second) => second.lastMessage.created - first.lastMessage.created) };
 		default: return state
 	}
 }
