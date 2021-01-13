@@ -20,7 +20,7 @@ function Channel(props) {
 				</div>
 				<div className="channel-info">
 					<h2>{props.channel.title}</h2>
-					<p>{props.channel.lastMessage}</p>
+					<p>{props.channel.lastMessage.body}</p>
 				</div>
 		</div>
 	);

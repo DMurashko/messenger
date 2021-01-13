@@ -72,7 +72,10 @@ function Messenger() {
 			const newChannel = {
 				_id: i,
 				title: `Channel title ${i}`,
-				lastMessage: `Hey how do you do ${i}`,
+				lastMessage: {
+					body: `Hey how do you do ${i}`,
+					created: (new Date).getTime()
+				},
 				members: [1],
 				created: new Date()
 			}
@@ -135,7 +138,7 @@ function Messenger() {
 			<div className="sidebar-right">
 				<div className="title">Members</div>
 				<div className="members">
-					{	channels.find(item => item._id === activeChannelId).members.map((memberId, index) => <Member memberId={memberId} key={index}/>)}
+					{channels.find(item => item._id === activeChannelId).members.map((memberId, index) => <Member memberId={memberId} key={index}/>)}
 				</div>
 			</div>
 		</main>

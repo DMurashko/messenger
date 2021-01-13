@@ -3,7 +3,6 @@ import {ObjectId} from '../helpers/objectid';
 import avatar from '../images/avatar.jpeg';
 import { useSelector, useDispatch } from 'react-redux';
 import { addMessage, updateLastMessage } from "../redux/actions";
-const _ = require('lodash');
 
 function MessengerInput() {
 	const [newMessage, setNewMessage] = useState('');
@@ -18,6 +17,7 @@ function MessengerInput() {
 
 	function handlerSend(event) {
 		const messageId = new ObjectId().toString();
+		const channelIndex = channels.findIndex(item => item._id === activeChannelId);
 		const message = {
 			_id: messageId,
 			body: newMessage,
@@ -31,12 +31,7 @@ function MessengerInput() {
 			me: true
 		};
 		dispatch(addMessage(message));
-		const returnedTarget = _.cloneDeep(channels);
-		returnedTarget.forEach((element) => {if (element._id === activeChannelId) {
-			element.lastMessage = message.body
-		}});
-		console.log(returnedTarget);
-		dispatch(updateLastMessage(newMessage, activeChannelId));
+		dispatch(updateLastMessage(newMessage, channelIndex));
 		setNewMessage('');
 	}
 

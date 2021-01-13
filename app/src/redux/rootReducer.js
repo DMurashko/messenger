@@ -1,6 +1,22 @@
 import {ADD_CHANNEL, ADD_MESSAGE, SET_ACTIVE_CHANNEL_ID, ORDER_CHANNELS, UPDATE_LAST_MESSAGE} from './types';
 import avatar from '../images/avatar.jpeg';
 
+function updateItemInArray(array, itemId, updateItemCallback) {
+	
+	const updatedItems = array.map((item, index) => {
+	  if (index !== itemId) {
+		// Since we only want to update one item, preserve all others as they are now
+		return item;
+	  }
+  
+	  // Use the provided callback to create an updated item
+	  const updatedItem = updateItemCallback(item);
+	  return updatedItem;
+	})
+	
+	return updatedItems;
+}
+
 const initialState = {
 	messages: [
 		{
@@ -33,7 +49,10 @@ const initialState = {
 		{
 			_id: 0,
 			title: `The fisrt`,
-			lastMessage: `Last message`,
+			lastMessage: {
+				body: `Last message`,
+				created: (new Date()).getTime()
+			},
 			members: [0, 1],
 			messages: [0, 1, 8, 10],
 			created: new Date()
@@ -79,9 +98,10 @@ const rootReducer = (state = initialState, action) => {
 		case ORDER_CHANNELS:
 			return { ...state, channels: state.channels.sort((first, second) => second.created.getTime() - first.created.getTime()) };
 		case UPDATE_LAST_MESSAGE:
-			return { ...state, channels: state.channels.forEach((element) => {if (element._id === action.payload.channel) {
-				element.lastMessage = action.payload.lastMessage
-			}})};
+			const newChannels = updateItemInArray(state.channels, action.payload.channelIndex, channel => {
+				return { ...channel, lastMessage: action.payload.lastMessage}
+			});
+			return { ...state, channels: newChannels };
 		default: return state
 	}
 }

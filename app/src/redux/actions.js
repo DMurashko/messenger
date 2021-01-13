@@ -43,8 +43,11 @@ export function updateLastMessage(messageBody, channelToBeUpdated) {
 	return {
 		type: UPDATE_LAST_MESSAGE,
 		payload: {
-			lastMessage: messageBody,
-			channel: channelToBeUpdated
+			lastMessage: {
+				body: messageBody,
+				created: (new Date).getDate()
+			},
+			channelIndex: channelToBeUpdated,
 		}
 	}
 }
