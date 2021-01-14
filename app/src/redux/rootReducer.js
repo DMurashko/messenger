@@ -1,4 +1,4 @@
-import {ADD_CHANNEL, ADD_MESSAGE, SET_ACTIVE_CHANNEL_ID, ORDER_CHANNELS, UPDATE_LAST_MESSAGE, ORDER_CHANNELS_BY_THE_LATEST_MESSAGE} from './types';
+import {ADD_CHANNEL, ADD_MESSAGE, SET_ACTIVE_CHANNEL_ID, ORDER_CHANNELS, UPDATE_LAST_MESSAGE, ORDER_CHANNELS_BY_THE_LATEST_MESSAGE, DISPLAY_SEARCH_BAR, HIDE_SEARCH_BAR, SET_SEARCH_RESULTS } from './types';
 import avatar from '../images/avatar.jpeg';
 
 function updateItemInArray(array, itemId, updateItemCallback) {
@@ -61,6 +61,8 @@ const initialState = {
 
 	activeChannelId: 0,
 
+	isSearchBarRequired: false,
+
 	currentUser: {
 		_id: 2,
 		name: 'Dimati',
@@ -82,6 +84,14 @@ const initialState = {
 			_id: 2,
 			name: 'Dimati',
 			created: new Date(),
+		}
+	],
+
+	searchResults: [
+		{
+			_id: 0,
+			name: 'Toan',
+			created: new Date()
 		}
 	]
 }
@@ -106,6 +116,12 @@ const rootReducer = (state = initialState, action) => {
 			return { ...state, channels: newChannels };
 		case ORDER_CHANNELS_BY_THE_LATEST_MESSAGE:
 			return { ...state, channels: state.channels.sort((first, second) => second.lastMessage.created - first.lastMessage.created) };
+		case DISPLAY_SEARCH_BAR:
+			return { ...state, isSearchBarRequired: true };
+		case HIDE_SEARCH_BAR:
+			return { ...state, isSearchBarRequired: false };
+		case SET_SEARCH_RESULTS:
+			return { ...state, searchResults: action.payload };
 		default: return state
 	}
 }

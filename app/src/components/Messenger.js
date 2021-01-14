@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import avatar from '../images/avatar.jpeg';
-import {addChannel, addMessage, orderChannels, setActiveChannelId} from '../redux/actions';
+import {addChannel, addMessage, displaySearchBar, orderChannels, setActiveChannelId} from '../redux/actions';
 import { useDispatch, useSelector} from 'react-redux';
 import Channel from './Channel.js';
 import Message from './Message.js';
 import Member from './Member';
 import MessengerInput from './MessengerInput';
+import SearchBar from './SearchBar';
 import {ObjectId} from '../helpers/objectid';
 
 function Messenger() {
@@ -19,6 +20,7 @@ function Messenger() {
 	const members = useSelector(state => state.members);
 	const activeChannelId = useSelector(state => state.activeChannelId);
 	const currentUser = useSelector(state => state.currentUser);
+	const isSearchBarRequired = useSelector(state => state.isSearchBarRequired)
 	const dispatch = useDispatch();
 	const messagesEndRef = useRef(null);
 	//Selecting the first channel and higlighting it
@@ -41,6 +43,7 @@ function Messenger() {
 		dispatch(addChannel(newChannel));
 		dispatch(setActiveChannelId(channelId));
 		dispatch(orderChannels());
+		dispatch(displaySearchBar());
 	}
 
 	function addTestMessages() {
@@ -109,7 +112,12 @@ function Messenger() {
 				<h2>Messenger</h2>
 				<button onClick={onCreateChannel} className="right-action"><i className="icon-edit-modify-streamline" /></button>
 			</div>
-			<div className="content"><h2>Title</h2></div>
+
+			<div className="content">
+			{isSearchBarRequired ? <SearchBar /> :
+			<h2>{channels.find(item => item._id === activeChannelId).title}</h2>}
+			</div>
+
 			<div className="right">
 				<div className="user-bar">
 					<div className="profile-name">Dmytro Murashko</div>
