@@ -1,4 +1,4 @@
-import {ADD_CHANNEL, ADD_MESSAGE, SET_ACTIVE_CHANNEL_ID, ORDER_CHANNELS, UPDATE_LAST_MESSAGE, ORDER_CHANNELS_BY_THE_LATEST_MESSAGE, DISPLAY_SEARCH_BAR, HIDE_SEARCH_BAR, SET_SEARCH_RESULTS } from './types';
+import {ADD_CHANNEL, ADD_MESSAGE, SET_ACTIVE_CHANNEL_ID, ORDER_CHANNELS, UPDATE_LAST_MESSAGE, ORDER_CHANNELS_BY_THE_LATEST_MESSAGE, DISPLAY_SEARCH_BAR, HIDE_SEARCH_BAR, SET_SEARCH_RESULTS, ADD_USER_TO_CHANNEL } from './types';
 import avatar from '../images/avatar.jpeg';
 
 function updateItemInArray(array, itemId, updateItemCallback) {
@@ -87,13 +87,7 @@ const initialState = {
 		}
 	],
 
-	searchResults: [
-		{
-			_id: 0,
-			name: 'Toan',
-			created: new Date()
-		}
-	]
+	searchResults: [],
 }
 
 
@@ -111,7 +105,7 @@ const rootReducer = (state = initialState, action) => {
 			return { ...state, channels: state.channels.sort((first, second) => second.created.getTime() - first.created.getTime()) };
 		case UPDATE_LAST_MESSAGE:
 			const newChannels = updateItemInArray(state.channels, action.payload.channelIndex, channel => {
-				return { ...channel, lastMessage: action.payload.lastMessage}
+				return { ...channel, lastMessage: action.payload.lastMessage }
 			});
 			return { ...state, channels: newChannels };
 		case ORDER_CHANNELS_BY_THE_LATEST_MESSAGE:
@@ -122,6 +116,15 @@ const rootReducer = (state = initialState, action) => {
 			return { ...state, isSearchBarRequired: false };
 		case SET_SEARCH_RESULTS:
 			return { ...state, searchResults: action.payload };
+		case ADD_USER_TO_CHANNEL:
+			if (state.channels[action.payload.channelIndex].members.some(item => item === action.payload.user))
+				return state;
+			const channelsWithNewUser = updateItemInArray(state.channels, action.payload.channelIndex, channel => {
+				return { ...channel, members: channel.members.concat([action.payload.user]) }
+			});
+			return { ...state, channels: channelsWithNewUser };
+			// const channelsWithNewUser = channelDublicationCheck( state.channels, action.payload.channelIndex, action.payload.user._id);
+			// return channelsWithNewUser ? { ...state, channels: channelsWithNewUser } : { ...state };
 		default: return state
 	}
 }

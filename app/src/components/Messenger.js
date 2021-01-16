@@ -77,7 +77,7 @@ function Messenger() {
 				title: `Channel title ${i}`,
 				lastMessage: {
 					body: `Hey how do you do ${i}`,
-					created: (new Date).getTime()
+					created: (new Date()).getTime()
 				},
 				members: [1],
 				created: new Date()
@@ -144,10 +144,14 @@ function Messenger() {
 
 			</div>
 			<div className="sidebar-right">
-				<div className="title">Members</div>
-				<div className="members">
-					{channels.find(item => item._id === activeChannelId).members.map((memberId, index) => <Member memberId={memberId} key={index}/>)}
-				</div>
+				{/* {isSearchBarRequired ? null :  */}
+					<div>
+						<div className="title">Members</div>
+						<div className="members">
+							{channels.find(item => item._id === activeChannelId).members.map((memberId, index) => <Member memberId={memberId} key={index}/>)}
+						</div>
+					</div>
+				{/* } */}
 			</div>
 		</main>
 	</div>
