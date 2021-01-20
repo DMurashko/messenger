@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import avatar from '../images/avatar.jpeg';
-import {addChannel, addMessage, displaySearchBar, orderChannels, setActiveChannelId} from '../redux/actions';
+import {addChannel, addMessage, displaySearchBar, login, orderChannels, setActiveChannelId} from '../redux/actions';
 import { useDispatch, useSelector} from 'react-redux';
 import Channel from './Channel.js';
 import Message from './Message.js';
@@ -8,6 +8,7 @@ import Member from './Member';
 import MessengerInput from './MessengerInput';
 import SearchBar from './SearchBar';
 import {ObjectId} from '../helpers/objectid';
+import UserBar from './UserBar';
 
 function Messenger() {
 
@@ -20,7 +21,8 @@ function Messenger() {
 	const members = useSelector(state => state.members);
 	const activeChannelId = useSelector(state => state.activeChannelId);
 	const currentUser = useSelector(state => state.currentUser);
-	const isSearchBarRequired = useSelector(state => state.isSearchBarRequired)
+	const isSearchBarRequired = useSelector(state => state.isSearchBarRequired);
+	const isUserFormRequired = useSelector(state => state.isUserFormRequired);
 	const dispatch = useDispatch();
 	const messagesEndRef = useRef(null);
 	//Selecting the first channel and higlighting it
@@ -79,7 +81,7 @@ function Messenger() {
 					body: `Hey how do you do ${i}`,
 					created: (new Date()).getTime()
 				},
-				members: [1],
+				members: [1, currentUser._id],
 				created: new Date()
 			}
 			dispatch(addChannel(newChannel));
@@ -93,7 +95,7 @@ function Messenger() {
 	useEffect(() => {
 		console.log('Component did mount');
 		window.addEventListener('resize', _onResize);
-		addTestMessages();
+		//addTestMessages();
 
 		return () => {
 			console.log('Component did unmount');
@@ -105,6 +107,16 @@ function Messenger() {
 		scrollToBottom();
 	}, [messages]);
 
+	useEffect(() => {
+		const lastLoginnedUser = window.localStorage.getItem('currentUser');
+		if (lastLoginnedUser)
+			dispatch(login(JSON.parse(lastLoginnedUser)));
+	}, []);
+
+	useEffect(() => {
+		window.localStorage.setItem('currentUser', JSON.stringify(currentUser));
+	}, [currentUser]);
+
 	return <div style={style} className="messenger">
 		<header>
 			<div className="left">
@@ -115,14 +127,11 @@ function Messenger() {
 
 			<div className="content">
 			{isSearchBarRequired ? <SearchBar /> :
-			<h2>{channels.find(item => item._id === activeChannelId).title}</h2>}
+			<h2>{channels.find(item => item._id === activeChannelId).members.map(memberId => members.find(member => member._id === memberId).name).join(', ')}</h2>}
 			</div>
 
 			<div className="right">
-				<div className="user-bar">
-					<div className="profile-name">Dmytro Murashko</div>
-					<div className="profile-image"><img src="https://www.gravatar.com/avatar/542604b3def2e5c426487929b982693d" alt="Avatar" /></div>
-				</div>
+				<UserBar />
 			</div>
 		</header>
 
@@ -139,19 +148,18 @@ function Messenger() {
 					{messages.filter(message => message.channelId === activeChannelId).map(message => <Message message={message} key={message._id} /> )}
 					<div ref={messagesEndRef} />
 				</div>
-
-				<MessengerInput />
-
+				
+				{ typeof(activeChannelId) == 'number' || 'string' && channels.find(item => item._id === activeChannelId).members.length > 1 ? <MessengerInput /> : null }
+				
 			</div>
 			<div className="sidebar-right">
-				{/* {isSearchBarRequired ? null :  */}
-					<div>
+				{(typeof(activeChannelId) == 'number' || 'string') && !isUserFormRequired && channels.find(item => item._id === activeChannelId).members.length > 1 ? 
+				<div>
 						<div className="title">Members</div>
 						<div className="members">
 							{channels.find(item => item._id === activeChannelId).members.map((memberId, index) => <Member memberId={memberId} key={index}/>)}
 						</div>
-					</div>
-				{/* } */}
+				</div> : null}
 			</div>
 		</main>
 	</div>

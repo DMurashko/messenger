@@ -2,13 +2,14 @@ import { useState } from "react";
 import {ObjectId} from '../helpers/objectid';
 import avatar from '../images/avatar.jpeg';
 import { useSelector, useDispatch } from 'react-redux';
-import { addMessage, updateLastMessage, orderChannelsByTheLatestMessage } from "../redux/actions";
+import { addMessage, updateLastMessage, orderChannelsByTheLatestMessage, hideSearchBar } from "../redux/actions";
 
 function MessengerInput() {
 	const [newMessage, setNewMessage] = useState('');
 	const activeChannelId = useSelector(state => state.activeChannelId);
 	const currentUser = useSelector(state => state.currentUser);
 	const channels = useSelector(state => state.channels);
+	const isSearchBarRequired = useSelector(state => state.isSearchBarRequired);
 	const dispatch = useDispatch();
 
 	function onChangeHandler(event) {
@@ -30,6 +31,8 @@ function MessengerInput() {
 			avatar: avatar,
 			me: true
 		};
+		if (isSearchBarRequired) 
+			dispatch(hideSearchBar());
 		dispatch(addMessage(message));
 		dispatch(updateLastMessage(newMessage, channelIndex));
 		dispatch(orderChannelsByTheLatestMessage(channelIndex));

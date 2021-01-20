@@ -1,4 +1,4 @@
-import {ADD_CHANNEL, ADD_MESSAGE, SET_ACTIVE_CHANNEL_ID, ORDER_CHANNELS, UPDATE_LAST_MESSAGE, ORDER_CHANNELS_BY_THE_LATEST_MESSAGE, DISPLAY_SEARCH_BAR, HIDE_SEARCH_BAR, SET_SEARCH_RESULTS, ADD_USER_TO_CHANNEL } from './types';
+import {ADD_CHANNEL, ADD_MESSAGE, SET_ACTIVE_CHANNEL_ID, ORDER_CHANNELS, UPDATE_LAST_MESSAGE, ORDER_CHANNELS_BY_THE_LATEST_MESSAGE, DISPLAY_SEARCH_BAR, HIDE_SEARCH_BAR, SET_SEARCH_RESULTS, ADD_USER_TO_CHANNEL, REMOVE_USER_FROM_CHANNEL, DELETE_CHANNEL, LOGIN, DISPLAY_USER_FORM, HIDE_USER_FORM } from './types';
 
 export function addMessage(message) {
 	return {
@@ -66,12 +66,48 @@ export function setSearchResults(results) {
 	}
 }
 
-export function addUserToChannel(channelIndex, user) {
+export function addUserToChannel(channelIndex, userId) {
 	return {
 		type: ADD_USER_TO_CHANNEL,
 		payload: {
 			channelIndex,
-			user
+			userId
 		}
+	}
+}
+
+export function removeUserFromChannel(channelIndex, userId) {
+	return {
+		type: REMOVE_USER_FROM_CHANNEL,
+		payload: {
+			channelIndex,
+			userId
+		}
+	}
+}
+
+export function deleteChannel(channelId) {
+	return {
+		type: DELETE_CHANNEL,
+		payload: channelId
+	}
+}
+
+export function login(user) {
+	return {
+		type: LOGIN,
+		payload: user
+	}
+}
+
+export function displayUserForm() {
+	return {
+		type: DISPLAY_USER_FORM
+	}
+}
+
+export function hideUserForm() {
+	return {
+		type: HIDE_USER_FORM
 	}
 }
