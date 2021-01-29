@@ -37,9 +37,9 @@ function Messenger() {
 		const channelId = new ObjectId().toString();
 		const newChannel = {
 			_id: channelId,
-			title: `New channel`,
-			lastMessage: ``,
-			members: [currentUser._id],
+			lastMessage: null,
+			members: [currentUser],
+			messages: [],
 			created: new Date()
 		}
 		dispatch(addChannel(newChannel));
@@ -126,8 +126,8 @@ function Messenger() {
 			</div>
 
 			<div className="content">
-			{isSearchBarRequired ? <SearchBar /> :
-			<h2>{channels.find(item => item._id === activeChannelId).members.map(memberId => members.find(member => member._id === memberId).name).join(', ')}</h2>}
+			{currentUser ? isSearchBarRequired ? <SearchBar /> :
+			<h2>{channels.some(elem => typeof(elem) === 'string') && channels.find(item => item._id === activeChannelId).members.map(memberId => members.find(member => member._id === memberId).name).join(', ')}</h2> : null}
 			</div>
 
 			<div className="right">
@@ -138,22 +138,22 @@ function Messenger() {
 		<main>
 			<div className="sidebar-left">
 				<div className="channels">
-					{channels.map((channel, index) => <Channel channel={channel} key={index}/>)}					
+					{channels && channels.map((channel, index) => <Channel channel={channel} key={index}/>)}					
 				</div>
 			</div>
 
 			<div className="content">
 
 				<div className="messages">
-					{messages.filter(message => message.channelId === activeChannelId).map(message => <Message message={message} key={message._id} /> )}
+					{messages && messages.filter(message => message.channelId === activeChannelId).map(message => <Message message={message} key={message._id} /> )}
 					<div ref={messagesEndRef} />
 				</div>
 				
-				{ typeof(activeChannelId) == 'number' || 'string' && channels.find(item => item._id === activeChannelId).members.length > 1 ? <MessengerInput /> : null }
+				{ currentUser ? typeof(activeChannelId) == 'number' || 'string' && channels.find(item => item._id === activeChannelId).members.length > 1 ? <MessengerInput /> : null : <p>Please authorize in the upper right corner!</p>}
 				
 			</div>
 			<div className="sidebar-right">
-				{(typeof(activeChannelId) == 'number' || 'string') && !isUserFormRequired && channels.find(item => item._id === activeChannelId).members.length > 1 ? 
+				{(currentUser && typeof(activeChannelId) == 'number' || 'string') && !isUserFormRequired && channels.some(elem => typeof(elem) === 'string') && channels.find(item => item._id === activeChannelId).members.length > 1 ? 
 				<div>
 						<div className="title">Members</div>
 						<div className="members">

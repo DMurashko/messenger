@@ -28,3 +28,6 @@ export const DELETE_CHANNEL = 'DELETE_CHANNEL';
 export const LOGIN = 'LOGIN';
 export const DISPLAY_USER_FORM = 'DISPLAY_USER_FORM';
 export const HIDE_USER_FORM = 'HIDE_USER_FORM';
+export const DISPLAY_USER_MENU = 'DISPLAY_USER_MENU';
+export const HIDE_USER_MENU = 'HIDE_USER_MENU';
+export const ADD_USER_TO_MEMBERS = 'ADD_USER_TO_MEMBERS';

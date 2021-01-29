@@ -1,4 +1,4 @@
-import {ADD_CHANNEL, ADD_MESSAGE, SET_ACTIVE_CHANNEL_ID, ORDER_CHANNELS, UPDATE_LAST_MESSAGE, ORDER_CHANNELS_BY_THE_LATEST_MESSAGE, DISPLAY_SEARCH_BAR, HIDE_SEARCH_BAR, SET_SEARCH_RESULTS, ADD_USER_TO_CHANNEL, REMOVE_USER_FROM_CHANNEL, DELETE_CHANNEL, LOGIN, DISPLAY_USER_FORM, HIDE_USER_FORM } from './types';
+import {ADD_CHANNEL, ADD_MESSAGE, SET_ACTIVE_CHANNEL_ID, ORDER_CHANNELS, UPDATE_LAST_MESSAGE, ORDER_CHANNELS_BY_THE_LATEST_MESSAGE, DISPLAY_SEARCH_BAR, HIDE_SEARCH_BAR, SET_SEARCH_RESULTS, ADD_USER_TO_CHANNEL, REMOVE_USER_FROM_CHANNEL, DELETE_CHANNEL, LOGIN, DISPLAY_USER_FORM, HIDE_USER_FORM, DISPLAY_USER_MENU, HIDE_USER_MENU, ADD_USER_TO_MEMBERS } from './types';
 import avatar from '../images/avatar.jpeg';
 
 function updateItemInArray(array, itemId, updateItemCallback) {
@@ -19,44 +19,32 @@ function updateItemInArray(array, itemId, updateItemCallback) {
 
 const initialState = {
 	messages: [
-		{
-			_id: 0,
-			channelId: 0,
-			user: {
-				_id: 0,
-				name: 'Toan',
-				created: new Date(),
-			},
-			body: 'I love React',
-			avatar: avatar,
-			me: true
-		},
-		{
-			_id: 1,
-			channelId: 0,
-			user: {
-				_id: 1,
-				name: 'Siegfried',
-				created: new Date(),
-			},
-			body: 'I love JS',
-			avatar: avatar,
-			me: false
-		}
+		// {
+		// 	_id: 0,
+		// 	channelId: 0,
+		// 	user: {
+		// 		_id: 0,
+		// 		name: 'Toan',
+		// 		created: new Date(),
+		// 	},
+		// 	body: 'I love React',
+		// 	avatar: avatar,
+		// 	me: true
+		// }
 	],
 	
 	channels: [
-		{
-			_id: 0,
-			title: `The fisrt`,
-			lastMessage: {
-				body: `Last message`,
-				created: (new Date()).getTime()
-			},
-			members: [0, 1],
-			messages: [0, 1, 8, 10],
-			created: new Date()
-		}
+		// {
+		// 	_id: 0,
+		// 	title: `The fisrt`,
+		// 	lastMessage: {
+		// 		body: `Last message`,
+		// 		created: (new Date()).getTime()
+		// 	},
+		// 	members: [0, 1],
+		// 	messages: [0, 1, 8, 10],
+		// 	created: new Date()
+		// }
 	],
 
 	activeChannelId: 0,
@@ -65,6 +53,8 @@ const initialState = {
 
 	isUserFormRequired: false,
 
+	isUserMenuRequired: false,
+
 	currentUser: null,//{
 	// 	_id: 2,
 	// 	name: 'Dimati',
@@ -72,26 +62,7 @@ const initialState = {
 	// 	created: new Date(),
 	// },
 
-	members: [
-		{
-			_id: 0,
-			name: 'Toan',
-			email: 'toan@gmail.com',
-			created: new Date(),
-		},
-		{
-			_id: 1,
-			name: 'Siegfried',
-			email: 'siegfried@gmail.com',
-			created: new Date(),
-		},
-		{
-			_id: 2,
-			name: 'Dimati',
-			email: 'dimati@gmail.com',
-			created: new Date(),
-		}
-	],
+	members: [],
 
 	searchResults: [],
 }
@@ -144,6 +115,12 @@ const rootReducer = (state = initialState, action) => {
 			return { ...state, isUserFormRequired: true };
 		case HIDE_USER_FORM:
 			return { ...state, isUserFormRequired: false };
+		case DISPLAY_USER_MENU:
+			return { ...state, isUserMenuRequired: true };
+		case HIDE_USER_MENU:
+			return { ...state, isUserMenuRequired: false };
+		case ADD_USER_TO_MEMBERS:
+			return { ...state, members: state.members.concat([action.payload]) };
 		default: return state
 	}
 }

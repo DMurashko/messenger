@@ -2,9 +2,22 @@ const express = require('express');
 const app = express();
 const server = require('http').createServer(app);
 const WebSocket = require('ws');
+const mongoose = require('mongoose');
+const config = require('config');
+const cors = require('cors');
+import fromNow from '../customFunctions/fromNow';
+import {AuthRouter, START_TIME} from './src/authRouter';
+import validateEmail from '../customFunctions/validateEmail';
 
-const PORT = 3000;
+const PORT = 3001;
 const wss = new WebSocket.Server({ server:server });
+
+app.use(express.json());
+app.use(cors());
+
+app.use('/api/auth', AuthRouter);
+
+app.get('/', (req, res) => res.json({started: fromNow(START_TIME), body: req.body}));
 
 wss.on('connection', function connection(ws) {
   console.log('A new client Connected!');
@@ -22,8 +35,20 @@ wss.on('connection', function connection(ws) {
   });
 });
 
-app.get('/', (req, res) => res.send('Hello World!'))
+async function start() {
+  try {
+    await mongoose.connect(config.get('mongoUri'), {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      useCreateIndex: true
+    })
+    server.listen(process.env.PORT || PORT, () => console.log(`Lisening on port :${PORT}`));
+  } catch (e) {
+    console.log('Server Error', e.message)
+    process.exit(1)
+  }
+}
 
-server.listen(process.env.PORT || PORT, () => console.log(`Lisening on port :3000`));
+start();
 
 module.exports = {app};

@@ -34,7 +34,7 @@ function SearchBar(props) {
 	return (
 		<div className="search-bar" >
 			<label>To:</label>
-			{
+			{	channels.some(elem => typeof(elem) === 'string') &&
 				channels.find(channel => channel._id === activeChannelId).members.map((userId, key) => {
 					return <span onClick={() => removeUser(userId)} key={key} >{members.find(member => member._id === userId).name}</span>
 				})

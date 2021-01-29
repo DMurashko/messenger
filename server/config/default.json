@@ -1,0 +1,7 @@
+{
+	"port": 3001,
+	"jwtSecret": "dmytro mern",
+	"mongoUri": "mongodb+srv://dmytro:20191Wsevolod@cluster0.fuxiq.mongodb.net/app?retryWrites=true&w=majority",
+	"baseUrl": "http://localhost:3001"
+}
+
