@@ -8,14 +8,16 @@ const cors = require('cors');
 import fromNow from '../customFunctions/fromNow';
 import {AuthRouter, START_TIME} from './src/authRouter';
 import validateEmail from '../customFunctions/validateEmail';
+import { dbRouter } from './src/userDataRouter';
 
 const PORT = 3001;
-const wss = new WebSocket.Server({ server:server });
+const wss = new WebSocket.Server({ server:server, clientTracking: true });
 
 app.use(express.json());
 app.use(cors());
 
 app.use('/api/auth', AuthRouter);
+app.use('/api/db/', dbRouter);
 
 app.get('/', (req, res) => res.json({started: fromNow(START_TIME), body: req.body}));
 

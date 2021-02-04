@@ -123,6 +123,14 @@ body{
   
     .right{
       width: $right-sidebar-width;
+      .login-btn{
+        height: $header-height;
+        border: 0 none;
+        background: none;
+        color: $primary-color;
+        font-weight: 600;
+        font-size: 14px;
+      }
       .user-bar{
         display: flex;
         justify-content: flex-end;
@@ -139,14 +147,6 @@ body{
             border-radius: 50%;
             margin: 10px 0 0 0;
           }
-        }
-        .login-btn{
-          height: $header-height;
-          border: 0 none;
-          background: none;
-          color: $primary-color;
-          font-weight: 600;
-          font-size: 14px;
         }
       }
       .user-form{

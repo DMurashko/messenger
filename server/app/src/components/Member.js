@@ -1,4 +1,4 @@
-import avatar from '../images/avatar.jpeg';
+import Avatar from 'react-avatar';
 import { useSelector} from 'react-redux';
 
 function Member(props) {
@@ -10,7 +10,7 @@ function Member(props) {
 		return (
 			<div className="member">
 				<div className="user-image">
-					<img src={avatar} alt="" />
+					<Avatar name={currentMember.name} size='40' round />
 				</div>
 				<div className="member-info">
 					<h2>{currentMember.name}</h2>
