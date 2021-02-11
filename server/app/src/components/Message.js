@@ -5,7 +5,7 @@ import { useSelector } from 'react-redux';
 function Message(props) {
 	const currentMessage = props.message;
 	const members = useSelector(state => state.members);
-	currentMessage.name = members.find(member => member._id === currentMessage.userId);
+	currentMessage.name = members.find(member => member._id === currentMessage.userId).name;
 
 	if (currentMessage) {
 		

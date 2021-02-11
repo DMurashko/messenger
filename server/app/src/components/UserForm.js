@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useHttp } from "../hooks/http.hooks";
+import request from "../utils/http";
 import { hideUserForm } from "../redux/actions";
 import { login } from '../redux/actions';
 
@@ -17,22 +17,8 @@ function UserForm() {
 	const [message, setMessage] = useState(null);
 	const [isNameRequired, setIsNameRequired] = useState(false);
 	const dispatch = useDispatch();
-	const members = useSelector(state => state.members);
+	const signinSuccess = useSelector(state => state.signinSuccess);
 	const ref = useRef();
-	const {loading, request} = useHttp();
-
-	function enterCredentials(mail, password) {
-		const mailHandled = mail.toString().toLowerCase();
-		return new Promise((resolve, reject) => {
-			const user = members.find(user => user.email === mailHandled);
-			if (user) {
-				dispatch(login(user));
-				return resolve(user);
-			} else {
-				return reject('User not found');
-			}
-		});
-	}
 
 	async function registerHandler(event) {
 		setMessage(null);
@@ -107,6 +93,7 @@ function UserForm() {
 						placeholder="Email addresss..."
 						value={form.email}
 						name="email"
+						autoComplete="username"
 					></input>
 				</div>
 
@@ -118,6 +105,7 @@ function UserForm() {
 						placeholder="Password..."
 						value={form.password}
 						name="password"
+						autoComplete="current-password"
 					></input>
 				</div>
 

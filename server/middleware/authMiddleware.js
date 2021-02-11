@@ -7,7 +7,7 @@ module.exports = (req, res, next) => {
   }
 
   try {
-
+	
     const token = req.headers.authorization.split(' ')[1]; // "Bearer TOKEN"
 
     if (!token) {
@@ -20,6 +20,7 @@ module.exports = (req, res, next) => {
     next();
 
   } catch (e) {
-    res.status(401).json({ message: 'The user is not authorized!' });
+	res.status(401).json({ message: 'The user is not authorized!' });
+	console.log(e);
   }
 }

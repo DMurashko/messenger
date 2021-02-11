@@ -1,51 +1,47 @@
-import {ADD_CHANNEL, ADD_MESSAGE, SET_ACTIVE_CHANNEL_ID, ORDER_CHANNELS, UPDATE_LAST_MESSAGE, ORDER_CHANNELS_BY_THE_LATEST_MESSAGE, DISPLAY_SEARCH_BAR, HIDE_SEARCH_BAR, SET_SEARCH_RESULTS, ADD_USER_TO_CHANNEL, REMOVE_USER_FROM_CHANNEL, DELETE_CHANNEL, LOGIN, DISPLAY_USER_FORM, HIDE_USER_FORM, DISPLAY_USER_MENU, HIDE_USER_MENU, ADD_USER_TO_MEMBERS } from './types';
-import avatar from '../images/avatar.jpeg';
+import {
+	ADD_CHANNEL, 
+	ADD_MESSAGE, 
+	SET_ACTIVE_CHANNEL_ID, 
+	ORDER_CHANNELS, 
+	UPDATE_LAST_MESSAGE, 
+	ORDER_CHANNELS_BY_THE_LATEST_MESSAGE, 
+	DISPLAY_SEARCH_BAR, 
+	HIDE_SEARCH_BAR, 
+	SET_SEARCH_RESULTS, 
+	ADD_USER_TO_CHANNEL, 
+	REMOVE_USER_FROM_CHANNEL, 
+	DELETE_CHANNEL, 
+	LOGIN, 
+	DISPLAY_USER_FORM, 
+	HIDE_USER_FORM, 
+	DISPLAY_USER_MENU, 
+	HIDE_USER_MENU, 
+	ADD_USER_TO_MEMBERS,
+	FETCH_STATUS,
+	REQUEST_SIGN_IN_SUCCESS,
+	SET_LAST_MESSAGE
+} from './types';
 
 function updateItemInArray(array, itemId, updateItemCallback) {
 	
 	const updatedItems = array.map((item, index) => {
-	  if (index !== itemId) {
-		// Since we only want to update one item, preserve all others as they are now
-		return item;
-	  }
-  
-	  // Use the provided callback to create an updated item
-	  const updatedItem = updateItemCallback(item);
-	  return updatedItem;
+		if (index !== itemId) {
+			// Since we only want to update one item, preserve all others as they are now
+			return item;
+		}
+	
+		// Use the provided callback to create an updated item
+		const updatedItem = updateItemCallback(item);
+		return updatedItem;
 	})
 	
 	return updatedItems;
 }
 
 const initialState = {
-	messages: [
-		// {
-		// 	_id: 0,
-		// 	channelId: 0,
-		// 	user: {
-		// 		_id: 0,
-		// 		name: 'Toan',
-		// 		created: new Date(),
-		// 	},
-		// 	body: 'I love React',
-		// 	avatar: avatar,
-		// 	me: true
-		// }
-	],
+	messages: [],
 	
-	channels: [
-		// {
-		// 	_id: 0,
-		// 	title: `The fisrt`,
-		// 	lastMessage: {
-		// 		body: `Last message`,
-		// 		created: (new Date()).getTime()
-		// 	},
-		// 	members: [0, 1],
-		// 	messages: [0, 1, 8, 10],
-		// 	created: new Date()
-		// }
-	],
+	channels: [],
 
 	activeChannelId: 0,
 
@@ -55,16 +51,15 @@ const initialState = {
 
 	isUserMenuRequired: false,
 
-	currentUser: null,//{
-	// 	_id: 2,
-	// 	name: 'Dimati',
-	// 	email: 'dimati@gmail.com',
-	// 	created: new Date(),
-	// },
+	currentUser: null,
 
 	members: [],
 
 	searchResults: [],
+
+	fetchStatus: false,
+
+	signinSuccess: false
 }
 
 
@@ -121,6 +116,15 @@ const rootReducer = (state = initialState, action) => {
 			return { ...state, isUserMenuRequired: false };
 		case ADD_USER_TO_MEMBERS:
 			return { ...state, members: state.members.concat([action.payload]) };
+		case FETCH_STATUS:
+			return { ...state, fetchStatus: action.payload };
+		case REQUEST_SIGN_IN_SUCCESS:
+			return { ...state, signinSuccess: action.payload };
+		case SET_LAST_MESSAGE:
+			const channelsWithLastMessage = updateItemInArray(state.channels, action.payload.channelId, channel => {
+				return { ...channel, lastMessage: action.payload.message }
+			});
+			return { ...state, channels: channelsWithLastMessage };
 		default: return state
 	}
 }

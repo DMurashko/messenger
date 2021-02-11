@@ -23,12 +23,7 @@ function MessengerInput() {
 			_id: messageId,
 			body: newMessage,
 			channelId: activeChannelId,
-			user: {
-				_id: currentUser._id,
-				name: currentUser.name,
-				created: currentUser.created,
-			},
-			avatar: avatar,
+			userId: currentUser.userId,
 			me: true
 		};
 		if (isSearchBarRequired) 

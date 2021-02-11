@@ -95,7 +95,7 @@ dbRouter.get('/message/:messageId/', auth,
 				return res.status(404).json({message: 'The message is not found'});
 			}
 
-			res.status(200).json({ user: retrievedMessage });
+			res.status(200).json({ message: retrievedMessage });
 		} catch (e) { 
 			console.log(e);
 			res.status(500).json({message: 'Something went wrong, try again later!'});

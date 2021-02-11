@@ -19,9 +19,9 @@ function Channel(props) {
 		dispatch(setActiveChannelId(key));
 	}
 
-	const peerId = props.channel.members.find(member => member !== currentUser._id);
+	const peerId = props.channel.members.find(member => member !== currentUser.userId);
 	const peer = members.find(member => member._id === peerId);
-	
+
 	return (
 		<div 
 			onClick={() => onSelectChannel(props.channel._id)} 
