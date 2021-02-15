@@ -21,6 +21,7 @@ import {
 	REQUEST_SIGN_IN_SUCCESS,
 	SET_LAST_MESSAGE
 } from './types';
+import {ObjectId} from '../helpers/objectid';
 
 function updateItemInArray(array, itemId, updateItemCallback) {
 	
@@ -33,9 +34,29 @@ function updateItemInArray(array, itemId, updateItemCallback) {
 		// Use the provided callback to create an updated item
 		const updatedItem = updateItemCallback(item);
 		return updatedItem;
-	})
+	});
 	
 	return updatedItems;
+}
+
+function updateItemInArrayById(array, itemId, updateItemCallback) {
+	
+	const updatedItems = array.map((item) => {
+		if (item._id !== itemId) {
+			// Since we only want to update one item, preserve all others as they are now
+			return item;
+		}
+	
+		// Use the provided callback to create an updated item
+		const updatedItem = updateItemCallback(item);
+		return updatedItem;
+	});
+	
+	return updatedItems;
+}
+
+function getTimeFromObjectId(obj) {
+	return ObjectId(obj._id).getTimestamp().getTime();
 }
 
 const initialState = {
@@ -74,14 +95,14 @@ const rootReducer = (state = initialState, action) => {
 		case SET_ACTIVE_CHANNEL_ID:
 			return { ...state, activeChannelId: action.payload };
 		case ORDER_CHANNELS:
-			return { ...state, channels: state.channels.sort((first, second) => second.created.getTime() - first.created.getTime()) };
+			return { ...state, channels: state.channels.sort((first, second) => getTimeFromObjectId(second) - getTimeFromObjectId(first)) };
 		case UPDATE_LAST_MESSAGE:
 			const newChannels = updateItemInArray(state.channels, action.payload.channelIndex, channel => {
 				return { ...channel, lastMessage: action.payload.lastMessage }
 			});
 			return { ...state, channels: newChannels };
 		case ORDER_CHANNELS_BY_THE_LATEST_MESSAGE:
-			return { ...state, channels: state.channels.sort((first, second) => second.lastMessage.created - first.lastMessage.created) };
+			return { ...state, channels: state.channels.sort((first, second) => getTimeFromObjectId(second.lastMessage)- getTimeFromObjectId(first.lastMessage)) };
 		case DISPLAY_SEARCH_BAR:
 			return { ...state, isSearchBarRequired: true };
 		case HIDE_SEARCH_BAR:
@@ -121,7 +142,7 @@ const rootReducer = (state = initialState, action) => {
 		case REQUEST_SIGN_IN_SUCCESS:
 			return { ...state, signinSuccess: action.payload };
 		case SET_LAST_MESSAGE:
-			const channelsWithLastMessage = updateItemInArray(state.channels, action.payload.channelId, channel => {
+			const channelsWithLastMessage = updateItemInArrayById(state.channels, action.payload.channelId, channel => {
 				return { ...channel, lastMessage: action.payload.message }
 			});
 			return { ...state, channels: channelsWithLastMessage };

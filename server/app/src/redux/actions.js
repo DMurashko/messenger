@@ -188,23 +188,25 @@ export function fetchGetUserData(currentUser) {
 			});
 			let channels = fetchedChannels.channels;
 			await dispatch(setActiveChannelId(channels[channels.length - 1]._id));
-			channels.forEach( async (item) => {
+			for (let item of channels) {
 				await dispatch(addChannel(item));
-			});
+			}
 			//users
 			async function getChatMembers(channel) {
-				channel.members.forEach(async (memberId) => {
+				for (let memberId of channel.members) {
 					const fetchedUser = await request(`http://localhost:3001/api/db/${memberId}/user`, 'GET', null, {
 						Authorization: `Bearer ${currentUser.token}`
 					});
 					let user = fetchedUser.user;
 					await dispatch(addUserToMembers(user));
-				});
+				}
 			}
-			channels.forEach(async (channel) => await getChatMembers(channel));
+			for (let channel of channels) {
+				await getChatMembers(channel);
+			}
 			//messages
 			async function getChannelMessages(channel) {
-				channel.messages.forEach(async (messageId) => {
+				for (let messageId of channel.messages) {
 					const fetchedMessages = await request(`http://localhost:3001/api/db/message/${messageId}`, 'GET', null, {
 						Authorization: `Bearer ${currentUser.token}`
 					});
@@ -212,17 +214,19 @@ export function fetchGetUserData(currentUser) {
 					await dispatch(setLastMessage(message, channel._id));
 					message.me = message._id === currentUser._id;
 					await dispatch(addMessage(message));
-				});
+				}
 			}
-			channels.forEach(async (channel) => await getChannelMessages(channel));
+			for (let channel of channels) {
+				await getChannelMessages(channel);
+			}
 			await dispatch(fetchStatus(false));
 			await dispatch(requestSigninSuccess(true));
 		} catch (err) {
 			if (err.response && err.response.status === 401) {
 				await dispatch(requestSigninSuccess(false));
-				//localStorage.removeItem("currentUser");
+				localStorage.removeItem("currentUser");
 			}
-			console.log(err);
+			console.log(err, JSON.stringify(err));
 		}
 	}
 }

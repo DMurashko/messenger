@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from 'react';
-import avatar from '../images/avatar.jpeg';
 import {addChannel, addMessage, addUserToMembers, displaySearchBar, fetchGetUserData, login, orderChannels, requestSigninSuccess, setActiveChannelId} from '../redux/actions';
 import { useDispatch, useSelector} from 'react-redux';
 import Channel from './Channel.js';
@@ -9,9 +8,7 @@ import MessengerInput from './MessengerInput';
 import SearchBar from './SearchBar';
 import {ObjectId} from '../helpers/objectid';
 import UserBar from './UserBar';
-import request from '../utils/http';
-import Avatar from 'react-avatar';
-import Test from './Test';
+import { io } from "socket.io-client";
 
 function Messenger() {
 
@@ -31,6 +28,12 @@ function Messenger() {
 	const signinSuccess = useSelector(state => state.signinSuccess);
 	const dispatch = useDispatch();
 	const messagesEndRef = useRef(null);
+	const socketClientRef = useRef();
+
+	function sendMessagesSocket(message) {
+		if (message)
+			socketClientRef.current.emit('message', message);
+	}
 
 	function _onResize() {
 		setHeight(window.innerHeight);
@@ -41,7 +44,7 @@ function Messenger() {
 		const newChannel = {
 			_id: channelId,
 			lastMessage: null,
-			members: [currentUser],
+			members: [currentUser.userId],
 			messages: [],
 			created: new Date()
 		}
@@ -54,6 +57,19 @@ function Messenger() {
 	function scrollToBottom() {
 		messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
 	}
+
+	useEffect(() => {
+		if (!!currentUser) {
+			const socket = io("http://localhost:3001/", {
+				transports: ['websocket'],
+				upgrade: false
+			});
+			socket.on('connect', () => {
+				socket.emit('setId', currentUser.userId);
+			});
+			socketClientRef.current = socket;
+		}
+	}, [currentUser]);
 
 	useEffect(() => {
 		console.log('Component did mount');
@@ -71,15 +87,13 @@ function Messenger() {
 	}, [messages]);
 
 	useEffect(() => {
-		console.log('checking LS');
 		const lastLoginnedUser = window.localStorage.getItem('currentUser');
 		if (!!!JSON.parse(lastLoginnedUser))
 			dispatch(requestSigninSuccess(false));
 		if (!!JSON.parse(lastLoginnedUser)) {
-			dispatch(requestSigninSuccess(true));
+			//dispatch(requestSigninSuccess(true));
 			dispatch(login(JSON.parse(lastLoginnedUser)));
 		}
-
 	}, []);
 
 	useEffect(() => {
@@ -88,17 +102,6 @@ function Messenger() {
 			dispatch(fetchGetUserData(currentUser));
 		}
 	}, [currentUser]);
-
-	//for testing purpose
-	useEffect(() => {
-		console.log('Members array:', members);
-	}, [members]);
-	useEffect(() => {
-		console.log('Channels array:', channels);
-	}, [channels]);
-	useEffect(() => {
-		console.log('Messages array:', messages);
-	}, [messages]);
 
 	return <div style={style} className="messenger">
 		<header>
@@ -109,7 +112,6 @@ function Messenger() {
 			</div>
 
 			<div className="content">
-			{console.log('Mapping channels for user names', !!members.length ? members : 'no content', !!channels.length ? channels : 'no content')}
 			{currentUser ? isSearchBarRequired ? <SearchBar /> :
 			<h2>{ !!channels.length &&
 				!!members.length &&
@@ -120,7 +122,6 @@ function Messenger() {
 			</div>
 
 			<div className="right">
-				{console.log('Right sidebar')}
 				<UserBar />
 			</div>
 		</header>
@@ -128,8 +129,8 @@ function Messenger() {
 		<main>
 			<div className="sidebar-left">
 				<div className="channels">
-					{channels.length && 
-					members.length &&
+					{!!channels.length && 
+					!!members.length &&
 					!fetchStatus &&
 					signinSuccess && 
 					channels.map((channel, index) => <Channel channel={channel} key={index}/>)}
@@ -139,12 +140,8 @@ function Messenger() {
 			<div className="content">
 
 				<div className="messages">
-					{/* {!!currentUser && <Test />} */}
-					{messages.length && 
-					!fetchStatus &&
-					signinSuccess && 
-					messages.map(message => <Message message={message} key={message._id} /> )}
-					{messages && 
+					{!!messages.length && 
+					!!members.length &&
 					!fetchStatus &&
 					signinSuccess && 
 					messages.filter(message => message.channelId === activeChannelId).map(message => <Message message={message} key={message._id} /> )}
@@ -155,9 +152,10 @@ function Messenger() {
 				(typeof(activeChannelId) == 'number' || 'string') && 
 				!fetchStatus &&
 				signinSuccess && 
-				channels.find(item => item._id === activeChannelId).members.length > 1 ? <MessengerInput /> : null : <div className="please-auth">Please authorize in the upper right corner!</div>}
+				channels.find(item => item._id === activeChannelId).members.length > 1 ? <MessengerInput socketHandler={sendMessagesSocket} /> : null : <div className="please-auth">Please authorize in the upper right corner!</div>}
 				
 			</div>
+
 			<div className="sidebar-right">
 				{currentUser && 
 				(typeof(activeChannelId) == 'number' || 'string') && 
@@ -173,6 +171,7 @@ function Messenger() {
 						</div>
 				</div> : null}
 			</div>
+
 		</main>
 	</div>
 }

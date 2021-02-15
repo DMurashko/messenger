@@ -2,9 +2,9 @@ import { useState } from "react";
 import {ObjectId} from '../helpers/objectid';
 import avatar from '../images/avatar.jpeg';
 import { useSelector, useDispatch } from 'react-redux';
-import { addMessage, updateLastMessage, orderChannelsByTheLatestMessage, hideSearchBar } from "../redux/actions";
+import { addMessage, updateLastMessage, orderChannelsByTheLatestMessage, hideSearchBar, setActiveChannelId, deleteChannel } from "../redux/actions";
 
-function MessengerInput() {
+function MessengerInput(props) {
 	const [newMessage, setNewMessage] = useState('');
 	const activeChannelId = useSelector(state => state.activeChannelId);
 	const currentUser = useSelector(state => state.currentUser);
@@ -28,10 +28,33 @@ function MessengerInput() {
 		};
 		if (isSearchBarRequired) 
 			dispatch(hideSearchBar());
+		props.socketHandler(JSON.stringify(message));
 		dispatch(addMessage(message));
 		dispatch(updateLastMessage(newMessage, channelIndex));
 		dispatch(orderChannelsByTheLatestMessage(channelIndex));
 		setNewMessage('');
+		//The feature below is going to be implemented in the future
+		// if (checkWheatherUnique(channelIndex)) {
+			
+		// } else {
+		// 	let thisChannel = activeChannelId;
+		// 	dispatch(setActiveChannelId(channels[1]._id));
+		// 	dispatch(deleteChannel(thisChannel));
+		// }
+	}
+
+	function checkWheatherUnique(channelIndex) {
+		const channelToCheck = channels[channelIndex];
+		const memberPairs = channels.splice(channelIndex, 1).map(channel => channel.members);
+		for (let pair of memberPairs) {
+			if (pair.length === channelToCheck.length) {
+				if (pair.every((val) => channelToCheck.find(val))) {
+					return false;
+				}
+			}
+		}
+
+		return true;
 	}
 
 	return (

@@ -23,16 +23,32 @@ function Channel(props) {
 	const peer = members.find(member => member._id === peerId);
 
 	return (
-		<div 
-			onClick={() => onSelectChannel(props.channel._id)} 
-			className={classNames("channel", {"active-channel": props.channel._id === activeChannelId})}>
-				<div className="user-image">
-					<Avatar name={peer.name} size='40' round />
-				</div>
-				<div className="channel-info">
-					<h2>{props.channel.members && props.channel.members.map(memberId => members.find(member => member._id === memberId).name).join(' ')}</h2>
-					<p>{props.channel.lastMessage.body}</p>
-				</div>
+		<div onClick={() => onSelectChannel(props.channel._id)} >
+
+				{channels.find(channel => channel._id === props.channel._id).members.length < 2 ? 
+					<div className={classNames("channel" , {"active-channel": props.channel._id === activeChannelId})}>
+						<div className="user-image">
+							<Avatar name='No Members' size='40' round />
+						</div>
+
+						<div className="channel-info">
+							<h2>No members</h2>
+							<p>No messages yet</p>
+						</div>
+					</div> :
+					<div className={classNames("channel" , {"active-channel": props.channel._id === activeChannelId})}>
+						<div className="user-image">
+							<Avatar name={peer.name} size='40' round />
+						</div>
+
+						<div className="channel-info">
+							<h2>{props.channel.members.length && 
+							props.channel.members.filter(memberId => memberId !== currentUser.userId).map(memberId => members.find(member => member._id === memberId).name).join(' ')}</h2>
+							<p>{props.channel.lastMessage ? props.channel.lastMessage.body : 'No messages yet'}</p>
+						</div>
+					</div>
+				}
+				
 		</div>
 	);
 }

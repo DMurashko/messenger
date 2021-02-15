@@ -1,9 +1,11 @@
 import Avatar from 'react-avatar';
 import { useSelector} from 'react-redux';
+import {ObjectId} from '../helpers/objectid';
 
 function Member(props) {
 	const members = useSelector(state => state.members);
 	const currentMember = members.find(element => element._id === props.memberId);
+	currentMember.created = ObjectId(currentMember._id).getTimestamp();
 
 	if (currentMember) {
 		
