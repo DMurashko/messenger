@@ -7,7 +7,7 @@ const config = require('config');
 const cors = require('cors');
 import fromNow from '../customFunctions/fromNow';
 import {AuthRouter, START_TIME} from './src/authRouter';
-import { createMessage } from './src/dbQueries';
+import { addMessageToChannel, createMessage } from './src/dbQueries';
 import { tempStorage, findUserIdBySocketId } from './src/tempStorage';
 import { dbRouter } from './src/userDataRouter';
 
@@ -47,6 +47,11 @@ io.on('connection', client => {
         if (doc) 
           console.log(doc);
       }
+    });
+    //db add message to the channel
+    addMessageToChannel({
+      messageId: msg._id,
+      channelId: msg.channelId
     });
     //if receiver online => broadcast to
     //let peerSocketId = tempStorage.get(msg.receiverId);
