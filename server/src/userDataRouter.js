@@ -3,6 +3,7 @@ import { Router } from "express";
 import Channel from './models/channelModel';
 import Message from './models/messageModel';
 import auth from '../middleware/authMiddleware';
+import { createMessage } from './dbQueries';
 const mongoose = require('mongoose');
 
 export const dbRouter = Router();
@@ -66,19 +67,13 @@ dbRouter.post('/message/',
 	async (req, res, next) => {
 		try {
 			const {userId, message, channelId} = req.body;
-			const newMessage = new Message({ 
-				channelId: channelId,
-				body: message,
-				userId: userId
-			});
-			console.log(newMessage);
-			await newMessage.save(function(err, doc) {
+			createMessage({userId, message, channelId, cb(err, doc) {
 				if (err) { console.log(err);
 					return res.status(400).json({message: 'Messages can\'t be saved'});
 				};
 				console.log("Document inserted succussfully!", doc);
 				res.status(201).json({ message: 'New message is created' });
-			});
+			}});
 		} catch (e) {
 			res.status(500).json({message: 'Something went wrong, try again later!'});
 		}
