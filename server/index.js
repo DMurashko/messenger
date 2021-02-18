@@ -1,18 +1,16 @@
 const express = require('express');
 const app = express();
 const server = require('http').createServer(app);
-//const WebSocket = require('ws');
 const mongoose = require('mongoose');
 const config = require('config');
 const cors = require('cors');
 import fromNow from '../customFunctions/fromNow';
 import {AuthRouter, START_TIME} from './src/authRouter';
-import { addMessageToChannel, createMessage } from './src/dbQueries';
+import { addMessageToChannel, createChannel, createMessage } from './src/dbQueries';
 import { tempStorage, findUserIdBySocketId } from './src/tempStorage';
 import { dbRouter } from './src/userDataRouter';
 
 const PORT = 3001;
-//const wss = new WebSocket.Server({ server:server, clientTracking: true });
 const io = require('socket.io')(server, {
   cors: {
     origin: "http://localhost:3000",
@@ -32,7 +30,15 @@ io.on('connection', client => {
   console.log('client is connected:', client.id);
   client.on('setId', (userId) => {
     tempStorage.set(userId, client.id);
-  })
+  });
+  client.on('createChannel', (channel) => {
+    console.log('Creating a new channel..Messages:', channel.messages);
+    createChannel({
+      _id: channel._id,
+      members: channel.members,
+      messages: channel.messages
+    });
+  });
   client.on('message', (msg) => {
     msg = JSON.parse(msg);
     //db create function call
@@ -82,18 +88,3 @@ async function start() {
 start();
 
 module.exports = {app};
-// wss.on('connection', function connection(ws) {
-//   console.log('A new client Connected!');
-//   ws.send('Welcome New Client!');
-
-//   ws.on('message', function incoming(message) {
-//     console.log('received: %s', message);
-
-//     wss.clients.forEach(function each(client) {
-//       if (client !== ws && client.readyState === WebSocket.OPEN) {
-//         client.send(message);
-//       }
-//     });
-    
-//   });
-// });

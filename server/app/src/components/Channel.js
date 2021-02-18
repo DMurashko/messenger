@@ -1,5 +1,5 @@
 import Avatar from 'react-avatar';
-import { deleteChannel, hideSearchBar, setActiveChannelId } from '../redux/actions';
+import { deleteChannel, hideSearchBar, onCreateNewChannel, setActiveChannelId } from '../redux/actions';
 import { useDispatch, useSelector } from 'react-redux';
 import classNames from 'classnames';
 
@@ -9,6 +9,7 @@ function Channel(props) {
 	const members = useSelector(state => state.members);
 	const channels = useSelector(state => state.channels);
 	const currentUser = useSelector(state => state.currentUser);
+	const creatingNewChannel = useSelector(state => state.creatingNewChannel)
 
 	function onSelectChannel(key) {
 		if (channels.find(channel => channel._id === activeChannelId).members.length < 1) {
@@ -16,41 +17,48 @@ function Channel(props) {
 			dispatch(deleteChannel(activeChannelId));
 			dispatch(hideSearchBar());
 		}
+		if (creatingNewChannel) {
+			dispatch(onCreateNewChannel(channels.find(channel => channel._id === activeChannelId), false, props.socketRef));
+		}
 		dispatch(setActiveChannelId(key));
 	}
 
-	const peerId = props.channel.members.find(member => member !== currentUser.userId);
-	const peer = members.find(member => member._id === peerId);
+	const peerId = props.channel && currentUser ? 
+		props.channel.members.find(member => member !== currentUser.userId) : null;
+	const peer = members.length && peerId && currentUser ? 
+		members.find(member => member._id === peerId) : null;
 
-	return (
-		<div onClick={() => onSelectChannel(props.channel._id)} >
+	if (currentUser) 
+		return (
+			<div onClick={() => onSelectChannel(props.channel._id)} >
 
-				{channels.find(channel => channel._id === props.channel._id).members.length < 2 ? 
-					<div className={classNames("channel" , {"active-channel": props.channel._id === activeChannelId})}>
-						<div className="user-image">
-							<Avatar name='No Members' size='40' round />
-						</div>
+					{channels.find(channel => channel._id === props.channel._id).members.length < 2 ? 
+						<div className={classNames("channel" , {"active-channel": props.channel._id === activeChannelId})}>
+							<div className="user-image">
+								<Avatar name='No Members' size='40' round />
+							</div>
 
-						<div className="channel-info">
-							<h2>No members</h2>
-							<p>No messages yet</p>
-						</div>
-					</div> :
-					<div className={classNames("channel" , {"active-channel": props.channel._id === activeChannelId})}>
-						<div className="user-image">
-							<Avatar name={peer.name} size='40' round />
-						</div>
+							<div className="channel-info">
+								<h2>No members</h2>
+								<p>No messages yet</p>
+							</div>
+						</div> :
+						<div className={classNames("channel" , {"active-channel": props.channel._id === activeChannelId})}>
+							<div className="user-image">
+								<Avatar name={peer.name} size='40' round />
+							</div>
 
-						<div className="channel-info">
-							<h2>{props.channel.members.length && 
-							props.channel.members.filter(memberId => memberId !== currentUser.userId).map(memberId => members.find(member => member._id === memberId).name).join(' ')}</h2>
-							<p>{props.channel.lastMessage ? props.channel.lastMessage.body : 'No messages yet'}</p>
+							<div className="channel-info">
+								<h2>{props.channel.members.length && 
+								props.channel.members.filter(memberId => memberId !== currentUser.userId).map(memberId => members.find(member => member._id === memberId).name).join(' ')}</h2>
+								<p>{props.channel.lastMessage ? props.channel.lastMessage.body : 'No messages yet'}</p>
+							</div>
 						</div>
-					</div>
-				}
-				
-		</div>
-	);
+					}
+					
+			</div>
+		);
+	return null;
 }
 
 export default Channel;

@@ -19,7 +19,12 @@ import {
 	ADD_USER_TO_MEMBERS,
 	FETCH_STATUS,
 	REQUEST_SIGN_IN_SUCCESS,
-	SET_LAST_MESSAGE
+	SET_LAST_MESSAGE,
+	ON_CREATE_NEW_CHANNEL,
+	ADD_MESSAGE_TO_CHANNEL,
+	CLEAR_CACHE_DATA,
+	DISPLAY_REGISTER_FORM,
+	HIDE_REGISTER_FORM
 } from './types';
 import {ObjectId} from '../helpers/objectid';
 
@@ -72,6 +77,8 @@ const initialState = {
 
 	isUserMenuRequired: false,
 
+	isReqisterFormRequired: false,
+
 	currentUser: null,
 
 	members: [],
@@ -80,7 +87,9 @@ const initialState = {
 
 	fetchStatus: false,
 
-	signinSuccess: false
+	signinSuccess: false,
+
+	creatingNewChannel: false
 }
 
 
@@ -116,6 +125,13 @@ const rootReducer = (state = initialState, action) => {
 				return { ...channel, members: channel.members.concat([action.payload.userId]) }
 			});
 			return { ...state, channels: channelsWithNewUser };
+		case ADD_MESSAGE_TO_CHANNEL:
+			if (state.channels.find(channel => channel._id === action.payload.channelId).messages.some(item => item === action.payload._id))
+				return state;
+			const channelsWithNewMessage = updateItemInArrayById(state.channels, action.payload.channelId, channel => {
+				return { ...channel, messages: channel.messages.concat([action.payload._id]) }
+			});
+			return { ...state, channels: channelsWithNewMessage };
 		case REMOVE_USER_FROM_CHANNEL:
 			if (!state.channels[action.payload.channelIndex].members.some(item => item === action.payload.userId))
 				return state;
@@ -131,6 +147,10 @@ const rootReducer = (state = initialState, action) => {
 			return { ...state, isUserFormRequired: true };
 		case HIDE_USER_FORM:
 			return { ...state, isUserFormRequired: false };
+		case DISPLAY_REGISTER_FORM:
+			return { ...state, isReqisterFormRequired: true };
+		case HIDE_REGISTER_FORM:
+			return { ...state, isReqisterFormRequired: false };
 		case DISPLAY_USER_MENU:
 			return { ...state, isUserMenuRequired: true };
 		case HIDE_USER_MENU:
@@ -146,6 +166,10 @@ const rootReducer = (state = initialState, action) => {
 				return { ...channel, lastMessage: action.payload.message }
 			});
 			return { ...state, channels: channelsWithLastMessage };
+		case ON_CREATE_NEW_CHANNEL:
+			return { ...state, creatingNewChannel: action.payload };
+		case CLEAR_CACHE_DATA:
+			return { ...state, messages: [], members: [], channels: [], searchResults: [] };
 		default: return state
 	}
 }

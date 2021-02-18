@@ -115,3 +115,20 @@ dbRouter.get('/:userId/user/', auth,
 		}
 	}
 );
+
+dbRouter.get('/users/', auth,
+	async (req, res, next) => {
+		try {
+			const retrievedUsers = await User.find({}).select('channels email name');
+			console.log("retrievedUsers: ", retrievedUsers);
+			if (!retrievedUsers) {
+				return res.status(404).json({message: 'The users are not found'});
+			}
+
+			res.status(200).json({ users: retrievedUsers });
+		} catch (e) { 
+			console.log(e);
+			res.status(500).json({message: 'Something went wrong, try again later!'});
+		}
+	}
+);

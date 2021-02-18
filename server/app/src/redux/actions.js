@@ -19,7 +19,12 @@ import {
 	ADD_USER_TO_MEMBERS,
 	FETCH_STATUS,
 	REQUEST_SIGN_IN_SUCCESS,
-	SET_LAST_MESSAGE
+	SET_LAST_MESSAGE,
+	ON_CREATE_NEW_CHANNEL,
+	ADD_MESSAGE_TO_CHANNEL,
+	CLEAR_CACHE_DATA,
+	DISPLAY_REGISTER_FORM,
+	HIDE_REGISTER_FORM
 } from './types';
 import request from '../utils/http';
 
@@ -135,6 +140,18 @@ export function hideUserForm() {
 	}
 }
 
+export function displayReqisterForm() {
+	return {
+		type: DISPLAY_REGISTER_FORM
+	}
+}
+
+export function hideReqisterForm() {
+	return {
+		type: HIDE_REGISTER_FORM
+	}
+}
+
 export function displayUserMenu() {
 	return {
 		type: DISPLAY_USER_MENU
@@ -154,7 +171,7 @@ export function addUserToMembers(user) {
 	}
 }
 
-export function fetchStatus(status) {
+export function setFetchStatus(status) {
 	return {
 		type: FETCH_STATUS,
 		payload: status
@@ -178,9 +195,40 @@ export function setLastMessage(message, channelId) {
 	}
 }
 
+export function clearCacheData() {
+	return {
+		type: CLEAR_CACHE_DATA
+	}
+}
+
+export function onCreateNewChannel(channel, status, socketClientRef) {
+	if (!status && channel && socketClientRef) {
+		socketClientRef.current.emit('createChannel', channel);
+	}
+
+	return {
+		type: ON_CREATE_NEW_CHANNEL,
+		payload: status
+	}
+}
+
+export function addMessageToChannel(message) {
+	const adjustedMsg = {
+		_id: message._id,
+		body: message.body,
+		channelId: message.channelId,
+		userId: message.userId
+	}
+	console.log('action entered', adjustedMsg);
+	return {
+		type: ADD_MESSAGE_TO_CHANNEL,
+		payload: adjustedMsg
+	}
+}
+
 export function fetchGetUserData(currentUser) {
 	return async (dispatch) => {
-		await dispatch(fetchStatus(true));
+		await dispatch(setFetchStatus(true));
 		try {
 			//channels
 			const fetchedChannels = await request(`http://localhost:3001/api/db/${currentUser.userId}/channels`, 'GET', null, {
@@ -192,18 +240,18 @@ export function fetchGetUserData(currentUser) {
 				await dispatch(addChannel(item));
 			}
 			//users
-			async function getChatMembers(channel) {
-				for (let memberId of channel.members) {
-					const fetchedUser = await request(`http://localhost:3001/api/db/${memberId}/user`, 'GET', null, {
-						Authorization: `Bearer ${currentUser.token}`
-					});
-					let user = fetchedUser.user;
+			async function getChatMembers() {
+				
+				const fetchedUser = await request(`http://localhost:3001/api/db/users`, 'GET', null, {
+					Authorization: `Bearer ${currentUser.token}`
+				});
+				let users = fetchedUser.users;
+
+				for (let user of users) {
 					await dispatch(addUserToMembers(user));
 				}
 			}
-			for (let channel of channels) {
-				await getChatMembers(channel);
-			}
+			await getChatMembers();
 			//messages
 			async function getChannelMessages(channel) {
 				for (let messageId of channel.messages) {
@@ -212,14 +260,14 @@ export function fetchGetUserData(currentUser) {
 					});
 					let message = fetchedMessages.message;
 					await dispatch(setLastMessage(message, channel._id));
-					message.me = message._id === currentUser._id;
+					message.me = message.userId === currentUser.userId;
 					await dispatch(addMessage(message));
 				}
 			}
 			for (let channel of channels) {
 				await getChannelMessages(channel);
 			}
-			await dispatch(fetchStatus(false));
+			await dispatch(setFetchStatus(false));
 			await dispatch(requestSigninSuccess(true));
 		} catch (err) {
 			if (err.response && err.response.status === 401) {

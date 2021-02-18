@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import {addChannel, addMessage, addUserToMembers, displaySearchBar, fetchGetUserData, login, orderChannels, requestSigninSuccess, setActiveChannelId} from '../redux/actions';
+import {addChannel, addMessage, addUserToMembers, setFetchStatus, displaySearchBar, fetchGetUserData, login, onCreateNewChannel, orderChannels, requestSigninSuccess, setActiveChannelId} from '../redux/actions';
 import { useDispatch, useSelector} from 'react-redux';
 import Channel from './Channel.js';
 import Message from './Message.js';
@@ -52,6 +52,7 @@ function Messenger() {
 		dispatch(setActiveChannelId(channelId));
 		dispatch(orderChannels());
 		dispatch(displaySearchBar());
+		dispatch(onCreateNewChannel(null, true, socketClientRef));
 	}
 
 	function scrollToBottom() {
@@ -91,7 +92,7 @@ function Messenger() {
 		if (!!!JSON.parse(lastLoginnedUser))
 			dispatch(requestSigninSuccess(false));
 		if (!!JSON.parse(lastLoginnedUser)) {
-			//dispatch(requestSigninSuccess(true));
+			dispatch(setFetchStatus(true));
 			dispatch(login(JSON.parse(lastLoginnedUser)));
 		}
 	}, []);
@@ -133,7 +134,7 @@ function Messenger() {
 					!!members.length &&
 					!fetchStatus &&
 					signinSuccess && 
-					channels.map((channel, index) => <Channel channel={channel} key={index}/>)}
+					channels.map((channel, index) => <Channel channel={channel} socketRef={socketClientRef} key={index}/>)}
 				</div>
 			</div>
 
@@ -157,6 +158,7 @@ function Messenger() {
 			</div>
 
 			<div className="sidebar-right">
+				{console.log(!!currentUser, (typeof(activeChannelId) === 'number' || 'string'), !fetchStatus, signinSuccess, !isUserFormRequired, channels.length)}
 				{currentUser && 
 				(typeof(activeChannelId) == 'number' || 'string') && 
 				!fetchStatus &&

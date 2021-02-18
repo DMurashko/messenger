@@ -50,6 +50,7 @@ function UserForm() {
 
 			request('http://localhost:3001/api/auth/login', 'POST', {...form}).then(response => {
 				console.log(response);
+				dispatch(hideUserForm());
 				dispatch(login(response));
 				setMessage(null);
 			}).catch(err => {

@@ -43,3 +43,26 @@ export async function addMessageToChannel({ messageId, channelId }) {
 		throw new Error('Ids are not defined');
 	}
 }
+
+export async function createChannel({ _id, members, messages }) {
+	if (_id && members.length) {
+		try {
+			const newChannel = new Channel({
+				_id: _id,
+				members: members,
+				messages: messages
+			});
+			
+			await newChannel.save((err, doc) => {
+				if (err)
+					console.log(err);
+				if (doc)
+					console.log(doc);
+			});
+		} catch(e) {
+			console.log(e);
+		}
+	} else {
+		throw new Error('Invalid data');
+	}
+}

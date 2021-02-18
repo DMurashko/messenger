@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { hideUserMenu, login } from "../redux/actions";
+import { clearCacheData, hideUserMenu, login, setFetchStatus, requestSigninSuccess } from "../redux/actions";
 
 function UserMenu(props) {
 
@@ -15,7 +15,10 @@ function UserMenu(props) {
 
 	function signOutHandler() {
 		dispatch(login(null));
+		dispatch(clearCacheData());
 		dispatch(hideUserMenu());
+		dispatch(setFetchStatus(false));
+		dispatch(requestSigninSuccess(false));
 	}
 
 	useEffect(() => {
