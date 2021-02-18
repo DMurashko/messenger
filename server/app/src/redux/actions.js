@@ -219,7 +219,7 @@ export function addMessageToChannel(message) {
 		channelId: message.channelId,
 		userId: message.userId
 	}
-	console.log('action entered', adjustedMsg);
+
 	return {
 		type: ADD_MESSAGE_TO_CHANNEL,
 		payload: adjustedMsg
@@ -234,10 +234,15 @@ export function fetchGetUserData(currentUser) {
 			const fetchedChannels = await request(`http://localhost:3001/api/db/${currentUser.userId}/channels`, 'GET', null, {
 				Authorization: `Bearer ${currentUser.token}`
 			});
-			let channels = fetchedChannels.channels;
-			await dispatch(setActiveChannelId(channels[channels.length - 1]._id));
-			for (let item of channels) {
-				await dispatch(addChannel(item));
+			if (fetchedChannels.channels) {
+				let channels = fetchedChannels.channels;
+				await dispatch(setActiveChannelId(channels[channels.length - 1]._id));
+				for (let item of channels) {
+					await dispatch(addChannel(item));
+				}
+				for (let channel of channels) {
+					await getChannelMessages(channel);
+				}
 			}
 			//users
 			async function getChatMembers() {
@@ -263,9 +268,6 @@ export function fetchGetUserData(currentUser) {
 					message.me = message.userId === currentUser.userId;
 					await dispatch(addMessage(message));
 				}
-			}
-			for (let channel of channels) {
-				await getChannelMessages(channel);
 			}
 			await dispatch(setFetchStatus(false));
 			await dispatch(requestSigninSuccess(true));

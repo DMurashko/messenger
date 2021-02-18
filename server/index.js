@@ -40,6 +40,7 @@ io.on('connection', client => {
     });
   });
   client.on('message', (msg) => {
+    console.log(msg);
     msg = JSON.parse(msg);
     //db create function call
     createMessage({
@@ -60,7 +61,10 @@ io.on('connection', client => {
       channelId: msg.channelId
     });
     //if receiver online => broadcast to
-    //let peerSocketId = tempStorage.get(msg.receiverId);
+    //let peerSocketIds = tempStorage.get(msg.receiverId);
+    for (let item of msg.receiverId) {
+      console.log('receiverId', item);
+    }
     //delete msg.receiverId;
     //if (peerSocketId)
     //io.to(peerSocketId).emit("message", msg);

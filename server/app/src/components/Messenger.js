@@ -68,6 +68,9 @@ function Messenger() {
 			socket.on('connect', () => {
 				socket.emit('setId', currentUser.userId);
 			});
+			socket.on('message', (msg) => {
+				;
+			});
 			socketClientRef.current = socket;
 		}
 	}, [currentUser]);
@@ -148,17 +151,18 @@ function Messenger() {
 					messages.filter(message => message.channelId === activeChannelId).map(message => <Message message={message} key={message._id} /> )}
 					<div ref={messagesEndRef} />
 				</div>
-				
 				{ currentUser ? 
 				(typeof(activeChannelId) == 'number' || 'string') && 
+				!!channels.length &&
 				!fetchStatus &&
 				signinSuccess && 
-				channels.find(item => item._id === activeChannelId).members.length > 1 ? <MessengerInput socketHandler={sendMessagesSocket} /> : null : <div className="please-auth">Please authorize in the upper right corner!</div>}
+				channels.find(item => item._id === activeChannelId).members.length > 1 ? 
+					<MessengerInput socketRef={socketClientRef} socketHandler={sendMessagesSocket} /> : null : 
+				<div className="please-auth">Please authorize in the upper right corner!</div>}
 				
 			</div>
 
 			<div className="sidebar-right">
-				{console.log(!!currentUser, (typeof(activeChannelId) === 'number' || 'string'), !fetchStatus, signinSuccess, !isUserFormRequired, channels.length)}
 				{currentUser && 
 				(typeof(activeChannelId) == 'number' || 'string') && 
 				!fetchStatus &&

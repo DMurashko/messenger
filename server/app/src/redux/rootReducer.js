@@ -77,7 +77,7 @@ const initialState = {
 
 	isUserMenuRequired: false,
 
-	isReqisterFormRequired: false,
+	isRegisterFormRequired: false,
 
 	currentUser: null,
 
@@ -148,9 +148,9 @@ const rootReducer = (state = initialState, action) => {
 		case HIDE_USER_FORM:
 			return { ...state, isUserFormRequired: false };
 		case DISPLAY_REGISTER_FORM:
-			return { ...state, isReqisterFormRequired: true };
+			return { ...state, isRegisterFormRequired: true };
 		case HIDE_REGISTER_FORM:
-			return { ...state, isReqisterFormRequired: false };
+			return { ...state, isRegisterFormRequired: false };
 		case DISPLAY_USER_MENU:
 			return { ...state, isUserMenuRequired: true };
 		case HIDE_USER_MENU:

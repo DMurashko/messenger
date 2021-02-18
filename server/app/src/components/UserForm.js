@@ -4,11 +4,6 @@ import request from "../utils/http";
 import { hideUserForm } from "../redux/actions";
 import { login } from '../redux/actions';
 
-function getUserById(userId, users) {
-	const user = users.find(user => user._id === userId);
-	return user;
-}
-
 function UserForm() {
 
 	const [form, setForm] = useState({
@@ -19,30 +14,6 @@ function UserForm() {
 	const dispatch = useDispatch();
 	const signinSuccess = useSelector(state => state.signinSuccess);
 	const ref = useRef();
-
-	async function registerHandler(event) {
-		setMessage(null);
-
-		if (isNameRequired && form.name.length >= 2) {
-			if (form.email && form.password) {
-
-				request('http://localhost:3001/api/auth/register', 'POST', {...form}).then(response => {
-					console.log(response);
-					setMessage(null);
-				}).catch(err => {
-					setMessage(err.message);
-					console.log(err);
-				});
-				setIsNameRequired(false);
-			}
-		} else {
-			setIsNameRequired(true);
-			setMessage('Please enter your name');
-			setTimeout(() => {
-				setMessage(null);
-			}, 3000);
-		}
-	}
 
 	function logInHandler(event) {
 		setMessage(null);
@@ -110,21 +81,7 @@ function UserForm() {
 					></input>
 				</div>
 
-				{isNameRequired ? 
-					<div className="form-item" >
-						<label>Name</label>
-						<input 
-							onChange={changeHandler} 
-							type="name" 
-							placeholder="Enter your name..."
-							value={form.name}
-							name="name"
-						></input>
-					</div>
-				: null}
-
 				<div className="form-actions">
-					<button onClick={registerHandler} type="button">Create an account?</button>
 					<button onClick={logInHandler} className="primary" type="button">Sign In</button>
 				</div>
 

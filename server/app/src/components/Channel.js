@@ -1,5 +1,5 @@
 import Avatar from 'react-avatar';
-import { deleteChannel, hideSearchBar, onCreateNewChannel, setActiveChannelId } from '../redux/actions';
+import { deleteChannel, hideSearchBar, setActiveChannelId } from '../redux/actions';
 import { useDispatch, useSelector } from 'react-redux';
 import classNames from 'classnames';
 
@@ -9,16 +9,12 @@ function Channel(props) {
 	const members = useSelector(state => state.members);
 	const channels = useSelector(state => state.channels);
 	const currentUser = useSelector(state => state.currentUser);
-	const creatingNewChannel = useSelector(state => state.creatingNewChannel)
 
 	function onSelectChannel(key) {
 		if (channels.find(channel => channel._id === activeChannelId).members.length < 1) {
 			console.log(activeChannelId, channels.find(channel => channel._id === activeChannelId).members.length < 1);
 			dispatch(deleteChannel(activeChannelId));
 			dispatch(hideSearchBar());
-		}
-		if (creatingNewChannel) {
-			dispatch(onCreateNewChannel(channels.find(channel => channel._id === activeChannelId), false, props.socketRef));
 		}
 		dispatch(setActiveChannelId(key));
 	}

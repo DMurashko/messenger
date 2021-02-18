@@ -2,7 +2,7 @@ import { useState } from "react";
 import {ObjectId} from '../helpers/objectid';
 import avatar from '../images/avatar.jpeg';
 import { useSelector, useDispatch } from 'react-redux';
-import { addMessage, updateLastMessage, orderChannelsByTheLatestMessage, hideSearchBar, setActiveChannelId, deleteChannel, addMessageToChannel } from "../redux/actions";
+import { addMessage, updateLastMessage, orderChannelsByTheLatestMessage, hideSearchBar, setActiveChannelId, onCreateNewChannel, addMessageToChannel } from "../redux/actions";
 
 function MessengerInput(props) {
 	const [newMessage, setNewMessage] = useState('');
@@ -10,6 +10,7 @@ function MessengerInput(props) {
 	const currentUser = useSelector(state => state.currentUser);
 	const channels = useSelector(state => state.channels);
 	const isSearchBarRequired = useSelector(state => state.isSearchBarRequired);
+	const creatingNewChannel = useSelector(state => state.creatingNewChannel);
 	const dispatch = useDispatch();
 
 	function onChangeHandler(event) {
@@ -19,15 +20,22 @@ function MessengerInput(props) {
 	function handlerSend(event) {
 		const messageId = new ObjectId().toString();
 		const channelIndex = channels.findIndex(item => item._id === activeChannelId);
+		const receiverId = channels[channelIndex].members.filter(member => member._id !== currentUser.userId);
+		console.log('receivedId', receiverId, channels[channelIndex].members.filter(member => member._id !== currentUser.userId));
 		const message = {
 			_id: messageId,
 			body: newMessage,
 			channelId: activeChannelId,
 			userId: currentUser.userId,
-			me: true
+			me: true,
+			receiverId: receiverId
 		};
-		if (isSearchBarRequired) 
+		if (isSearchBarRequired) {
+			if (creatingNewChannel) {
+				dispatch(onCreateNewChannel(channels[channelIndex], false, props.socketRef));
+			}
 			dispatch(hideSearchBar());
+		}
 		props.socketHandler(JSON.stringify(message));
 		dispatch(addMessage(message));
 		dispatch(addMessageToChannel(message));
