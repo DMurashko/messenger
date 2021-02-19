@@ -20,8 +20,9 @@ function MessengerInput(props) {
 	function handlerSend(event) {
 		const messageId = new ObjectId().toString();
 		const channelIndex = channels.findIndex(item => item._id === activeChannelId);
-		const receiverId = channels[channelIndex].members.filter(member => member._id !== currentUser.userId);
-		console.log('receivedId', receiverId, channels[channelIndex].members.filter(member => member._id !== currentUser.userId));
+		const receiverId = channels[channelIndex].members.filter(member => {
+			return member !== currentUser.userId;
+		});
 		const message = {
 			_id: messageId,
 			body: newMessage,

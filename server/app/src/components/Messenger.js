@@ -1,5 +1,20 @@
 import React, { useState, useEffect, useRef } from 'react';
-import {addChannel, addMessage, addUserToMembers, setFetchStatus, displaySearchBar, fetchGetUserData, login, onCreateNewChannel, orderChannels, requestSigninSuccess, setActiveChannelId} from '../redux/actions';
+import {
+	addChannel, 
+	addMessage, 
+	addUserToMembers, 
+	setFetchStatus, 
+	displaySearchBar, 
+	fetchGetUserData, 
+	login, 
+	onCreateNewChannel, 
+	orderChannels, 
+	requestSigninSuccess, 
+	setActiveChannelId,
+	orderChannelsByTheLatestMessage,
+	updateLastMessage,
+	addMessageToChannel
+} from '../redux/actions';
 import { useDispatch, useSelector} from 'react-redux';
 import Channel from './Channel.js';
 import Message from './Message.js';
@@ -56,7 +71,8 @@ function Messenger() {
 	}
 
 	function scrollToBottom() {
-		messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+		if (messagesEndRef.current)
+			messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
 	}
 
 	useEffect(() => {
@@ -68,8 +84,12 @@ function Messenger() {
 			socket.on('connect', () => {
 				socket.emit('setId', currentUser.userId);
 			});
-			socket.on('message', (msg) => {
-				;
+			socket.on('message', (message) => {
+				const channelIndex = channels.findIndex(item => item._id === message.channelId);
+				dispatch(addMessage(message));
+				dispatch(addMessageToChannel(message));
+				dispatch(updateLastMessage(newMessage, channelIndex));
+				dispatch(orderChannelsByTheLatestMessage(channelIndex));;
 			});
 			socketClientRef.current = socket;
 		}
@@ -91,23 +111,27 @@ function Messenger() {
 	}, [messages]);
 
 	useEffect(() => {
-		const lastLoginnedUser = window.localStorage.getItem('currentUser');
-		if (!!!JSON.parse(lastLoginnedUser))
-			dispatch(requestSigninSuccess(false));
-		if (!!JSON.parse(lastLoginnedUser)) {
-			dispatch(setFetchStatus(true));
-			dispatch(login(JSON.parse(lastLoginnedUser)));
+		const lastLoginnedUser = localStorage.getItem('currentUser');
+		if (lastLoginnedUser !== 'undefined') {
+			if (!!!JSON.parse(lastLoginnedUser))
+				dispatch(requestSigninSuccess(false));
+			if (!!JSON.parse(lastLoginnedUser)) {
+				dispatch(setFetchStatus(true));
+				dispatch(login(JSON.parse(lastLoginnedUser)));
+			}
 		}
 	}, []);
 
 	useEffect(() => {
-		window.localStorage.setItem('currentUser', JSON.stringify(currentUser));
+		localStorage.setItem('currentUser', JSON.stringify(currentUser));
 		if (currentUser) {
 			dispatch(fetchGetUserData(currentUser));
 		}
 	}, [currentUser]);
 
-	return <div style={style} className="messenger">
+	return members && channels && messages ?
+
+	 <div style={style} className="messenger">
 		<header>
 			<div className="left">
 				<button className="left-action"><i className="icon-settings-streamline" /></button>
@@ -179,7 +203,7 @@ function Messenger() {
 			</div>
 
 		</main>
-	</div>
+	</div> : null;
 }
 
 export default (Messenger);
