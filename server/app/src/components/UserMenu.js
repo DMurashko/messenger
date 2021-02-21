@@ -1,6 +1,12 @@
-import { useState, useRef, useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { clearCacheData, hideUserMenu, login, setFetchStatus, requestSigninSuccess } from "../redux/actions";
+import { useRef, useEffect } from "react";
+import { useDispatch } from "react-redux";
+import { 
+	clearCacheData, 
+	hideUserMenu, 
+	login, 
+	setFetchStatus, 
+	requestSigninSuccess 
+} from "../redux/actions";
 
 function UserMenu(props) {
 

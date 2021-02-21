@@ -1,7 +1,13 @@
 import { useState, useRef, useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import request from "../utils/http";
-import { hideReqisterForm } from "../redux/actions";
+import { 
+	hideReqisterForm,
+	clearCacheData,
+	login, 
+	setFetchStatus, 
+	requestSigninSuccess
+} from "../redux/actions";
 
 function RegisterForm() {
 
@@ -17,13 +23,21 @@ function RegisterForm() {
 
 		if (form.email && form.password && form.name.length >= 2) {
 
-			request('http://localhost:3001/api/auth/register', 'POST', {...form}).then((response) => {
-				console.log(response);
-				setMessage('Registration is successful! Now sign in!');
-				setTimeout(() => {
-					setMessage(null);
+			request('/api/auth/register', 'POST', {...form}).then((response) => {
+				if (response === 401) {
+					dispatch(login(null));
+					dispatch(clearCacheData());
 					dispatch(hideReqisterForm());
-				}, 1000);
+					dispatch(setFetchStatus(false));
+					dispatch(requestSigninSuccess(false));
+				} else {
+					console.log(response);
+					setMessage('Registration is successful! Now sign in!');
+					setTimeout(() => {
+						setMessage(null);
+						dispatch(hideReqisterForm());
+					}, 1000);
+				}
 			}).catch(err => {
 				setMessage(err.message);
 				console.log(err);

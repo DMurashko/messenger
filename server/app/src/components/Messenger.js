@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import {
 	addChannel, 
 	addMessage, 
-	addUserToMembers, 
 	setFetchStatus, 
 	displaySearchBar, 
 	fetchGetUserData, 
@@ -24,11 +23,11 @@ import SearchBar from './SearchBar';
 import {ObjectId} from '../helpers/objectid';
 import UserBar from './UserBar';
 import { io } from "socket.io-client";
+import config from '../config.json';
 
 function Messenger() {
 
 	const [height, setHeight] = useState(window.innerHeight);
-	const [test, setTest] = useState([]);
 	const style ={
 		height: height,
 	}
@@ -77,7 +76,7 @@ function Messenger() {
 
 	useEffect(() => {
 		if (!!currentUser) {
-			const socket = io("http://localhost:3001/", {
+			const socket = io(config.websocket.url, {
 				transports: ['websocket'],
 				upgrade: false
 			});
@@ -101,7 +100,6 @@ function Messenger() {
 	useEffect(() => {
 		console.log('Component did mount');
 		window.addEventListener('resize', _onResize);
-		//addTestMessages();
 
 		return () => {
 			console.log('Component did unmount');
@@ -149,7 +147,15 @@ function Messenger() {
 				!fetchStatus &&
 				activeChannelId &&
 				signinSuccess
-				? channels.find(item => item._id === activeChannelId).members.map(memberId => members.find(member => member._id === memberId).name).join(', ') : null }</h2> : null}
+				? channels
+					.find(item => item._id === activeChannelId)
+					.members
+					.map(memberId => 
+						members.find(member => member._id === memberId).name
+					)
+					.join(', ') 
+				: null }
+			</h2> : null}
 			</div>
 
 			<div className="right">
@@ -175,7 +181,9 @@ function Messenger() {
 					!!members.length &&
 					!fetchStatus &&
 					signinSuccess && 
-					messages.filter(message => message.channelId === activeChannelId).map(message => <Message message={message} key={message._id} /> )}
+					messages
+						.filter(message => message.channelId === activeChannelId)
+						.map(message => <Message message={message} key={message._id} /> )}
 					<div ref={messagesEndRef} />
 				</div>
 				{ currentUser ? 
@@ -200,7 +208,10 @@ function Messenger() {
 				<div>
 						<div className="title">Members</div>
 						<div className="members">
-							{channels.find(item => item._id === activeChannelId).members.map((memberId, index) => <Member memberId={memberId} key={index}/>)}
+							{channels
+								.find(item => item._id === activeChannelId)
+								.members
+								.map((memberId, index) => <Member memberId={memberId} key={index}/>)}
 						</div>
 				</div> : null}
 			</div>

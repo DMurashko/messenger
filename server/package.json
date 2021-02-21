@@ -4,10 +4,12 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node -r esm index.js",
+    "start": "cross-env NODE_ENV=production node -r esm index.js",
     "server": "nodemon -r esm index.js",
     "client": "npm run start --prefix app",
-    "dev": "concurrently \"npm run server\" \"npm run client\""
+    "client:install": "npm install --prefix app",
+    "client:build": "npm run build --prefix app",
+    "dev": "cross-env NODE_ENV=development concurrently \"npm run server\" \"npm run client\""
   },
   "proxy": "http://localhost:3001",
   "keywords": [],
@@ -29,6 +31,7 @@
     "ws": "^7.3.0"
   },
   "devDependencies": {
+    "cross-env": "^7.0.3",
     "nodemon": "^2.0.7"
   }
 }

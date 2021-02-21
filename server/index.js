@@ -4,16 +4,16 @@ const server = require('http').createServer(app);
 const mongoose = require('mongoose');
 const config = require('config');
 const cors = require('cors');
-import fromNow from '../customFunctions/fromNow';
-import {AuthRouter, START_TIME} from './src/authRouter';
+const path = require('path');
+import { AuthRouter } from './src/authRouter';
 import { addMessageToChannel, createChannel, createMessage } from './src/dbQueries';
 import { tempStorage, findUserIdBySocketId } from './src/tempStorage';
-import { dbRouter } from './src/userDataRouter';
+import { dbRouter } from './src/dbRouter';
 
-const PORT = 3001;
+const PORT = config.get('port') || 3001;
 const io = require('socket.io')(server, {
   cors: {
-    origin: "http://localhost:3000",
+    origin: config.get('clientUrl'),
     methods: ["GET", "POST"]
   }
 });
@@ -24,8 +24,15 @@ app.use(cors());
 app.use('/api/auth', AuthRouter);
 app.use('/api/db/', dbRouter);
 
-app.get('/', (req, res) => res.json({started: fromNow(START_TIME), body: req.body}));
+if (process.env.NODE_ENV === 'production') {
+  app.use('/', express.static(path.join(__dirname, 'app', 'build')));
 
+  app.get('*', (req, res) => {
+    res.sendFile(path.resolve(__dirname, 'app', 'build', 'index.html'));
+  });
+}
+
+//starting the websockets and defining the event listeners
 io.on('connection', client => {
   console.log('client is connected:', client.id);
   //adding new user to the Map object of current connections
@@ -76,6 +83,7 @@ io.on('connection', client => {
   });
 });
 
+//establishing connection to the DB and starting the server
 async function start() {
   try {
     await mongoose.connect(config.get('mongoUri'), {

@@ -1,4 +1,4 @@
-import User from '../src/models/user';
+import User from './models/user';
 import { Router } from "express";
 import Channel from './models/channelModel';
 import Message from './models/messageModel';

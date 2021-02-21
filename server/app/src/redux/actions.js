@@ -231,7 +231,7 @@ export function fetchGetUserData(currentUser) {
 		await dispatch(setFetchStatus(true));
 		try {
 			//channels
-			const fetchedChannels = await request(`http://localhost:3001/api/db/${currentUser.userId}/channels`, 'GET', null, {
+			const fetchedChannels = await request(`/api/db/${currentUser.userId}/channels`, 'GET', null, {
 				Authorization: `Bearer ${currentUser.token}`
 			});
 			if (fetchedChannels.channels) {
@@ -247,7 +247,7 @@ export function fetchGetUserData(currentUser) {
 			//users
 			async function getChatMembers() {
 				
-				const fetchedUser = await request(`http://localhost:3001/api/db/users`, 'GET', null, {
+				const fetchedUser = await request(`/api/db/users`, 'GET', null, {
 					Authorization: `Bearer ${currentUser.token}`
 				});
 				let users = fetchedUser.users;
@@ -260,7 +260,7 @@ export function fetchGetUserData(currentUser) {
 			//messages
 			async function getChannelMessages(channel) {
 				for (let messageId of channel.messages) {
-					const fetchedMessages = await request(`http://localhost:3001/api/db/message/${messageId}`, 'GET', null, {
+					const fetchedMessages = await request(`/api/db/message/${messageId}`, 'GET', null, {
 						Authorization: `Bearer ${currentUser.token}`
 					});
 					let message = fetchedMessages.message;

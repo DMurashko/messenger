@@ -1,8 +1,7 @@
 import { useState } from "react";
 import {ObjectId} from '../helpers/objectid';
-import avatar from '../images/avatar.jpeg';
 import { useSelector, useDispatch } from 'react-redux';
-import { addMessage, updateLastMessage, orderChannelsByTheLatestMessage, hideSearchBar, setActiveChannelId, onCreateNewChannel, addMessageToChannel } from "../redux/actions";
+import { addMessage, updateLastMessage, orderChannelsByTheLatestMessage, hideSearchBar, onCreateNewChannel, addMessageToChannel } from "../redux/actions";
 
 function MessengerInput(props) {
 	const [newMessage, setNewMessage] = useState('');

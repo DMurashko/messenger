@@ -1,8 +1,13 @@
 import { useState, useRef, useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import request from "../utils/http";
-import { hideUserForm } from "../redux/actions";
-import { login } from '../redux/actions';
+import { 
+	hideUserForm,
+	clearCacheData,
+	login, 
+	setFetchStatus, 
+	requestSigninSuccess 
+} from "../redux/actions";
 
 function UserForm() {
 
@@ -10,25 +15,30 @@ function UserForm() {
 		email: '', password: ''
 	});
 	const [message, setMessage] = useState(null);
-	const [isNameRequired, setIsNameRequired] = useState(false);
 	const dispatch = useDispatch();
-	const signinSuccess = useSelector(state => state.signinSuccess);
 	const ref = useRef();
 
 	function logInHandler(event) {
 		setMessage(null);
 		if (form.email && form.password) {
 
-			request('http://localhost:3001/api/auth/login', 'POST', {...form}).then(response => {
-				console.log(response);
-				dispatch(hideUserForm());
-				dispatch(login(response));
-				setMessage(null);
+			request('/api/auth/login', 'POST', {...form}).then(response => {
+				if (response === 401) {
+					dispatch(login(null));
+					dispatch(clearCacheData());
+					dispatch(hideUserForm());
+					dispatch(setFetchStatus(false));
+					dispatch(requestSigninSuccess(false));
+				} else {
+					console.log(response);
+					dispatch(hideUserForm());
+					dispatch(login(response));
+					setMessage(null);
+				}
 			}).catch(err => {
 				setMessage(err.message);
 				console.log(err);
 			});
-			setIsNameRequired(false);
 		}
 	}
 
@@ -39,7 +49,6 @@ function UserForm() {
 	function onClickOutside(e) {
 		if (ref.current && !ref.current.contains(e.target)) {
 			dispatch(hideUserForm());
-			setIsNameRequired(false);
 		}
 	}
 	
