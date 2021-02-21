@@ -28,11 +28,12 @@ app.get('/', (req, res) => res.json({started: fromNow(START_TIME), body: req.bod
 
 io.on('connection', client => {
   console.log('client is connected:', client.id);
+  //adding new user to the Map object of current connections
   client.on('setId', (userId) => {
     tempStorage.set(userId, client.id);
   });
+  //creating channel in the db in Channel model
   client.on('createChannel', (channel) => {
-    console.log('Creating a new channel..Messages:', channel.messages);
     createChannel({
       _id: channel._id,
       members: channel.members,
@@ -41,7 +42,7 @@ io.on('connection', client => {
   });
   client.on('message', (msg) => {
     msg = JSON.parse(msg);
-    //db create function call
+    //creating message in the db in Message model
     createMessage({
       userId: msg.userId,
       channelId: msg.channelId,
@@ -54,24 +55,20 @@ io.on('connection', client => {
           console.log('message pushed to db successfully');
       }
     });
-    //db add message to the channel
+    //adding message to the channel in db to document`s messages property of Channel model
     addMessageToChannel({
       messageId: msg._id,
       channelId: msg.channelId
     });
-    //if receiver online => broadcast to
-    //
+    //if receiver online then server sends message directly to the specified socket.id
     for (let item of msg.receiverId) {
-      console.log('receiverId', item);
-      let peerSocketIds = tempStorage.get(item);
-      console.log('receiverSocketId', peerSocketIds);
+      const msgCleared = Object.assign({}, msg);
+      delete msgCleared.receiverId;
+      delete msgCleared.me;
+      const peerSocketIds = tempStorage.get(item);
       if (peerSocketIds)
         io.to(peerSocketIds).emit("message", msg);
     }
-    //delete msg.receiverId;
-    //if (peerSocketId)
-    //io.to(peerSocketId).emit("message", msg);
-    //console.log('connectedClients:', io.sockets);
   });
   client.on('disconnect', () => {
     tempStorage.delete(findUserIdBySocketId(client.id));

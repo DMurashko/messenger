@@ -81,12 +81,14 @@ function Messenger() {
 				transports: ['websocket'],
 				upgrade: false
 			});
+			//sending currentUser id to the server in order to bind it to the id of current socket.id
 			socket.on('connect', () => {
 				socket.emit('setId', currentUser.userId);
 			});
 			socket.on('message', (message) => {
 				console.log('message has arrived:', message);
 				const channelIndex = channels.findIndex(item => item._id === message.channelId);
+				message.me = message.userId === currentUser.userId;
 				dispatch(addMessage(message));
 				dispatch(addMessageToChannel(message));
 				dispatch(updateLastMessage(message, channelIndex));
