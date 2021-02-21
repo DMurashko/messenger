@@ -67,7 +67,7 @@ io.on('connection', client => {
       delete msgCleared.me;
       const peerSocketIds = tempStorage.get(item);
       if (peerSocketIds)
-        io.to(peerSocketIds).emit("message", msg);
+        io.to(peerSocketIds).emit("message", msgCleared);
     }
   });
   client.on('disconnect', () => {
