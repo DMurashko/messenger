@@ -13,7 +13,7 @@ dbRouter.get('/:userId/channels/', auth,
 		try {
 			const userId = req.params.userId;
 			const retrievedChannels = await Channel.find({'members': mongoose.Types.ObjectId(userId) });
-			console.log("Is here", retrievedChannels);
+			
 			if (!retrievedChannels.length) {
 				return res.status(404).json({message: 'No channels are found'});
 			}
@@ -36,7 +36,7 @@ dbRouter.post('/channel/',
 				if (err) {
 					return res.status(400).json({message: 'Channels can\'t be saved'});
 				};
-				console.log("Document inserted succussfully!", doc);
+				console.log("Document inserted succussfully!");
 				res.status(201).json({ channels: 'New channel is created' });
 			});
 		} catch (e) {
@@ -50,7 +50,7 @@ dbRouter.get('/:userId/messages/', auth,
 		try {
 			const userId = req.params.userId;
 			const retrievedMessages = await Message.find({'userId': mongoose.Types.ObjectId(userId) });
-			console.log("Is here", retrievedMessages);
+			
 			if (!retrievedMessages) {
 				return res.status(404).json({message: 'No channels are found'});
 			}
@@ -68,10 +68,11 @@ dbRouter.post('/message/',
 		try {
 			const {userId, message, channelId} = req.body;
 			createMessage({userId, message, channelId, cb(err, doc) {
-				if (err) { console.log(err);
+				if (err) { 
+					console.log(err);
 					return res.status(400).json({message: 'Messages can\'t be saved'});
-				};
-				console.log("Document inserted succussfully!", doc);
+				}
+				console.log("Document inserted succussfully!");
 				res.status(201).json({ message: 'New message is created' });
 			}});
 		} catch (e) {
@@ -85,7 +86,7 @@ dbRouter.get('/message/:messageId/', auth,
 		try {
 			const messageId = req.params.messageId;
 			const retrievedMessage = await Message.findById(mongoose.Types.ObjectId(messageId));
-			console.log("Is here", retrievedMessage);
+			
 			if (!retrievedMessage) {
 				return res.status(404).json({message: 'The message is not found'});
 			}
@@ -103,7 +104,7 @@ dbRouter.get('/:userId/user/', auth,
 		try {
 			const userId = req.params.userId;
 			const retrievedUser = await User.findById(mongoose.Types.ObjectId(userId)).select('channels email name');
-			console.log("Is here", retrievedUser);
+			
 			if (!retrievedUser) {
 				return res.status(404).json({message: 'The user is not found'});
 			}
@@ -120,7 +121,7 @@ dbRouter.get('/users/', auth,
 	async (req, res, next) => {
 		try {
 			const retrievedUsers = await User.find({}).select('channels email name');
-			console.log("retrievedUsers: ", retrievedUsers);
+			
 			if (!retrievedUsers) {
 				return res.status(404).json({message: 'The users are not found'});
 			}

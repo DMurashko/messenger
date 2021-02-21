@@ -85,10 +85,11 @@ function Messenger() {
 				socket.emit('setId', currentUser.userId);
 			});
 			socket.on('message', (message) => {
+				console.log('message has arrived:', message);
 				const channelIndex = channels.findIndex(item => item._id === message.channelId);
 				dispatch(addMessage(message));
 				dispatch(addMessageToChannel(message));
-				dispatch(updateLastMessage(newMessage, channelIndex));
+				dispatch(updateLastMessage(message, channelIndex));
 				dispatch(orderChannelsByTheLatestMessage(channelIndex));;
 			});
 			socketClientRef.current = socket;

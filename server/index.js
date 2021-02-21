@@ -40,7 +40,6 @@ io.on('connection', client => {
     });
   });
   client.on('message', (msg) => {
-    console.log(msg);
     msg = JSON.parse(msg);
     //db create function call
     createMessage({
@@ -52,7 +51,7 @@ io.on('connection', client => {
         if (err)
           console.log(err);
         if (doc) 
-          console.log(doc);
+          console.log('message pushed to db successfully');
       }
     });
     //db add message to the channel
@@ -61,17 +60,22 @@ io.on('connection', client => {
       channelId: msg.channelId
     });
     //if receiver online => broadcast to
-    //let peerSocketIds = tempStorage.get(msg.receiverId);
+    //
     for (let item of msg.receiverId) {
       console.log('receiverId', item);
+      let peerSocketIds = tempStorage.get(item);
+      console.log('receiverSocketId', peerSocketIds);
+      if (peerSocketIds)
+        io.to(peerSocketIds).emit("message", msg);
     }
     //delete msg.receiverId;
     //if (peerSocketId)
     //io.to(peerSocketId).emit("message", msg);
-    console.log('message: ' + msg, '\ncliend.id', tempStorage.get(msg.userId));
+    //console.log('connectedClients:', io.sockets);
   });
   client.on('disconnect', () => {
-    console.log('Client is disconnected');
+    tempStorage.delete(findUserIdBySocketId(client.id));
+    console.log('Client is disconnected', tempStorage.entries());
   });
 });
 
