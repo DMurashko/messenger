@@ -4,16 +4,17 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "startup": "npm install && npm run client:install && npm run dev",
     "start": "cross-env NODE_ENV=production node -r esm index.js",
     "server": "nodemon -r esm index.js",
-    "client": "npm run start --prefix app",
-    "client:install": "npm install --prefix app",
-    "client:build": "npm run build --prefix app",
-    "dev": "cross-env NODE_ENV=development concurrently \"npm run server\" \"npm run client\""
+    "client": "npm run start --prefix client",
+    "client:install": "npm install --prefix client",
+    "client:build": "npm run build --prefix client",
+    "dev": "cross-env NODE_ENV=development concurrently 'npm run server' 'npm run client'"
   },
   "proxy": "http://localhost:3001",
   "keywords": [],
-  "author": "DM",
+  "author": "DMurashko",
   "license": "ISC",
   "dependencies": {
     "bcrypt": "^5.0.0",
