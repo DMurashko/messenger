@@ -272,11 +272,15 @@ export function fetchGetUserData(currentUser) {
 			await dispatch(setFetchStatus(false));
 			await dispatch(requestSigninSuccess(true));
 		} catch (err) {
-			if (err.response && err.response.status === 401) {
+			if (err.message == 401) {
+				await dispatch(login(null));
+				await dispatch(clearCacheData());
+				await dispatch(hideUserMenu());
+				await dispatch(setFetchStatus(false));
 				await dispatch(requestSigninSuccess(false));
 				localStorage.removeItem("currentUser");
 			}
-			console.log(err, JSON.stringify(err));
+			console.log(err);
 		}
 	}
 }

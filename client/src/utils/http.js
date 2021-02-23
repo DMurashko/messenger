@@ -9,7 +9,7 @@ export default async function request (url, method = 'GET', body = null, headers
 		const data = await response.json();
 
 		if (response.status === 401 && !response.ok) {
-			return 401;
+			throw new Error(401);
 		}
 
 		if (response.status !== 404 && !response.ok) {
