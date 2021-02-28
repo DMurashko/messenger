@@ -204,6 +204,7 @@ export function clearCacheData() {
 export function onCreateNewChannel(channel, status, socketClientRef) {
 	if (!status && channel && socketClientRef) {
 		socketClientRef.current.emit('createChannel', channel);
+		console.log('a channel must be sent');
 	}
 
 	return {

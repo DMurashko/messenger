@@ -41,11 +41,17 @@ io.on('connection', client => {
   });
   //creating channel in the db in Channel model
   client.on('createChannel', (channel) => {
-    createChannel({
+    const newChannel = {
       _id: channel._id,
       members: channel.members,
       messages: channel.messages
-    });
+    }
+    createChannel(newChannel);
+    for (let item of channel.members) {
+      const peerSocketId = tempStorage.get(item);
+      if (peerSocketId)
+        io.to(peerSocketId).emit('receiveNewChannel', newChannel);
+    }
   });
   client.on('message', (msg) => {
     msg = JSON.parse(msg);

@@ -1,7 +1,7 @@
 {
   "name": "messenger",
-  "version": "1.0.0",
-  "description": "",
+  "version": "1.0.1",
+  "description": "Realtime messenger",
   "main": "index.js",
   "scripts": {
     "startup": "npm install && npm run client:install && npm run dev",
@@ -12,7 +12,6 @@
     "client:build": "npm run build --prefix client",
     "dev": "cross-env NODE_ENV=development concurrently 'npm run server' 'npm run client'"
   },
-  "proxy": "http://localhost:3001",
   "keywords": [],
   "author": "DMurashko",
   "license": "ISC",

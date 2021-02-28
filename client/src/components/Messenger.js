@@ -84,6 +84,7 @@ function Messenger() {
 			socket.on('connect', () => {
 				socket.emit('setId', currentUser.userId);
 			});
+			//rendering a message from a peer
 			socket.on('message', (message) => {
 				console.log('message has arrived:', message);
 				const channelIndex = channels.findIndex(item => item._id === message.channelId);
@@ -92,6 +93,13 @@ function Messenger() {
 				dispatch(addMessageToChannel(message));
 				dispatch(updateLastMessage(message, channelIndex));
 				dispatch(orderChannelsByTheLatestMessage(channelIndex));;
+			});
+			//rendering a new channel created by a peer
+			socket.on('receiveNewChannel', (channel) => {
+				console.log('channel is created by a peer', channel);
+				dispatch(addChannel(channel));
+				dispatch(setActiveChannelId(channel._id));
+				dispatch(orderChannels());
 			});
 			socketClientRef.current = socket;
 		}
