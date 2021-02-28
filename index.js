@@ -49,7 +49,7 @@ io.on('connection', client => {
     createChannel(newChannel);
     for (let item of channel.members) {
       const peerSocketId = tempStorage.get(item);
-      if (peerSocketId)
+      if (peerSocketId && peerSocketId !== client.id)
         io.to(peerSocketId).emit('receiveNewChannel', newChannel);
     }
   });
