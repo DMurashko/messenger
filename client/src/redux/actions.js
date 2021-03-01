@@ -20,7 +20,7 @@ import {
 	FETCH_STATUS,
 	REQUEST_SIGN_IN_SUCCESS,
 	SET_LAST_MESSAGE,
-	ON_CREATE_NEW_CHANNEL,
+	SEND_NEW_CHANNEL,
 	ADD_MESSAGE_TO_CHANNEL,
 	CLEAR_CACHE_DATA,
 	DISPLAY_REGISTER_FORM,
@@ -201,15 +201,66 @@ export function clearCacheData() {
 	}
 }
 
-export function onCreateNewChannel(channel, status, socketClientRef) {
+export function fullLogOut() {
+	return async (dispatch) => {
+		dispatch(login(null));
+		dispatch(clearCacheData());
+		dispatch(hideUserForm());
+		dispatch(setFetchStatus(false));
+		dispatch(requestSigninSuccess(false));
+	}
+}
+
+export function fullLogIn(form, setMessage) {
+	return async (dispatch) => {
+		if (setMessage)
+			setMessage(null);
+		if (form.email && form.password) {
+
+			request('/api/auth/login', 'POST', {...form}).then(response => {
+				if (response === 401) {
+					dispatch(fullLogOut());
+				} else {
+					console.log(response);
+					dispatch(hideUserForm());
+					dispatch(login(response));
+					if (setMessage)
+						setMessage(null);
+				}
+			}).catch(err => {
+				setMessage(err.message);
+				console.log(err);
+			});
+		}
+	}
+}
+
+export function sendNewChannel(channel, status, socketClientRef) {
 	if (!status && channel && socketClientRef) {
 		socketClientRef.current.emit('createChannel', channel);
 		console.log('a channel must be sent');
 	}
 
 	return {
-		type: ON_CREATE_NEW_CHANNEL,
+		type: SEND_NEW_CHANNEL,
 		payload: status
+	}
+}
+
+export function createNewChannel(newChannel, channelId) {
+	return async (dispatch) => {
+		dispatch(addChannel(newChannel));
+		dispatch(setActiveChannelId(channelId));
+		dispatch(orderChannels());
+	}
+}
+
+export function createNewMessage(message, newMessage, channelIndex) {
+	return async (dispatch) => {
+		dispatch(addMessage(message));
+		dispatch(addMessageToChannel(message));
+		dispatch(updateLastMessage(newMessage, channelIndex));
+		dispatch(orderChannelsByTheLatestMessage(channelIndex));
 	}
 }
 
@@ -274,11 +325,7 @@ export function fetchGetUserData(currentUser) {
 			await dispatch(requestSigninSuccess(true));
 		} catch (err) {
 			if (err.message == 401) {
-				await dispatch(login(null));
-				await dispatch(clearCacheData());
-				await dispatch(hideUserMenu());
-				await dispatch(setFetchStatus(false));
-				await dispatch(requestSigninSuccess(false));
+				await dispatch(fullLogOut());
 				localStorage.removeItem("currentUser");
 			}
 			console.log(err);

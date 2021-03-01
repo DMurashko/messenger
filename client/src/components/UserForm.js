@@ -6,7 +6,8 @@ import {
 	clearCacheData,
 	login, 
 	setFetchStatus, 
-	requestSigninSuccess 
+	requestSigninSuccess, 
+	fullLogIn
 } from "../redux/actions";
 
 function UserForm() {
@@ -18,28 +19,8 @@ function UserForm() {
 	const dispatch = useDispatch();
 	const ref = useRef();
 
-	function logInHandler(event) {
-		setMessage(null);
-		if (form.email && form.password) {
-
-			request('/api/auth/login', 'POST', {...form}).then(response => {
-				if (response === 401) {
-					dispatch(login(null));
-					dispatch(clearCacheData());
-					dispatch(hideUserForm());
-					dispatch(setFetchStatus(false));
-					dispatch(requestSigninSuccess(false));
-				} else {
-					console.log(response);
-					dispatch(hideUserForm());
-					dispatch(login(response));
-					setMessage(null);
-				}
-			}).catch(err => {
-				setMessage(err.message);
-				console.log(err);
-			});
-		}
+	function logInHandler() {
+		dispatch(fullLogIn(form, setMessage));
 	}
 
 	function changeHandler(event) {

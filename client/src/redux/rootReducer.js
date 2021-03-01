@@ -20,7 +20,7 @@ import {
 	FETCH_STATUS,
 	REQUEST_SIGN_IN_SUCCESS,
 	SET_LAST_MESSAGE,
-	ON_CREATE_NEW_CHANNEL,
+	SEND_NEW_CHANNEL,
 	ADD_MESSAGE_TO_CHANNEL,
 	CLEAR_CACHE_DATA,
 	DISPLAY_REGISTER_FORM,
@@ -166,7 +166,7 @@ const rootReducer = (state = initialState, action) => {
 				return { ...channel, lastMessage: action.payload.message }
 			});
 			return { ...state, channels: channelsWithLastMessage };
-		case ON_CREATE_NEW_CHANNEL:
+		case SEND_NEW_CHANNEL:
 			return { ...state, creatingNewChannel: action.payload };
 		case CLEAR_CACHE_DATA:
 			return { ...state, messages: [], members: [], channels: [], searchResults: [] };

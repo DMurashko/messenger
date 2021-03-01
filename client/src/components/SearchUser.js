@@ -1,4 +1,4 @@
-import avatar from '../images/avatar.jpeg';
+import Avatar from 'react-avatar';
 import { useDispatch, useSelector } from "react-redux";
 import { addUserToChannel } from '../redux/actions';
 
@@ -14,7 +14,7 @@ function User(props) {
 
 	return (
 		<div onClick={() => onClickHandler(props.user)} className="user" >
-			<img src={avatar} alt="Avatar" />
+			<Avatar name={props.user.name} size='40' round />
 			<h2>{props.user.name}</h2>
 		</div>
 	);

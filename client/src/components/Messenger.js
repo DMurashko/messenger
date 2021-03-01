@@ -1,18 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
-	addChannel, 
-	addMessage, 
 	setFetchStatus, 
 	displaySearchBar, 
 	fetchGetUserData, 
 	login, 
-	onCreateNewChannel, 
-	orderChannels, 
-	requestSigninSuccess, 
-	setActiveChannelId,
-	orderChannelsByTheLatestMessage,
-	updateLastMessage,
-	addMessageToChannel
+	sendNewChannel,
+	requestSigninSuccess,
+	createNewChannel,
+	createNewMessage
 } from '../redux/actions';
 import { useDispatch, useSelector} from 'react-redux';
 import Channel from './Channel.js';
@@ -62,11 +57,9 @@ function Messenger() {
 			messages: [],
 			created: new Date()
 		}
-		dispatch(addChannel(newChannel));
-		dispatch(setActiveChannelId(channelId));
-		dispatch(orderChannels());
+		disptach(createNewChannel(newChannel, channelId));
 		dispatch(displaySearchBar());
-		dispatch(onCreateNewChannel(null, true, socketClientRef));
+		dispatch(sendNewChannel(null, true, socketClientRef));
 	}
 
 	function scrollToBottom() {
@@ -76,7 +69,7 @@ function Messenger() {
 
 	useEffect(() => {
 		if (!!currentUser) {
-			const socket = io(config.websocket.url, {
+			const socket = io(config.websocket.url + config.websocket.port, {
 				transports: ['websocket'],
 				upgrade: false
 			});
@@ -89,17 +82,12 @@ function Messenger() {
 				console.log('message has arrived:', message);
 				const channelIndex = channels.findIndex(item => item._id === message.channelId);
 				message.me = message.userId === currentUser.userId;
-				dispatch(addMessage(message));
-				dispatch(addMessageToChannel(message));
-				dispatch(updateLastMessage(message, channelIndex));
-				dispatch(orderChannelsByTheLatestMessage(channelIndex));;
+				dispatch(createNewMessage(message, message.body, channelIndex));
 			});
 			//rendering a new channel created by a peer
 			socket.on('receiveNewChannel', (channel) => {
 				console.log('channel is created by a peer', channel);
-				dispatch(addChannel(channel));
-				dispatch(setActiveChannelId(channel._id));
-				dispatch(orderChannels());
+				dispatch(createNewChannel(channel, channel._id));
 			});
 			socketClientRef.current = socket;
 		}

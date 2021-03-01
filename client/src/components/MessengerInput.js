@@ -1,7 +1,11 @@
 import { useState } from "react";
 import {ObjectId} from '../helpers/objectid';
 import { useSelector, useDispatch } from 'react-redux';
-import { addMessage, updateLastMessage, orderChannelsByTheLatestMessage, hideSearchBar, onCreateNewChannel, addMessageToChannel } from "../redux/actions";
+import { 
+	hideSearchBar, 
+	sendNewChannel, 
+	createNewMessage
+} from "../redux/actions";
 
 function MessengerInput(props) {
 	const [newMessage, setNewMessage] = useState('');
@@ -16,7 +20,7 @@ function MessengerInput(props) {
 		setNewMessage(event.target.value);
 	}
 
-	function handlerSend(event) {
+	function handlerSend() {
 		const messageId = new ObjectId().toString();
 		const channelIndex = channels.findIndex(item => item._id === activeChannelId);
 		const receiverId = channels[channelIndex].members.filter(member => {
@@ -32,15 +36,12 @@ function MessengerInput(props) {
 		};
 		if (isSearchBarRequired) {
 			if (creatingNewChannel) {
-				dispatch(onCreateNewChannel(channels[channelIndex], false, props.socketRef));
+				dispatch(sendNewChannel(channels[channelIndex], false, props.socketRef));
 			}
 			dispatch(hideSearchBar());
 		}
 		props.socketHandler(JSON.stringify(message));
-		dispatch(addMessage(message));
-		dispatch(addMessageToChannel(message));
-		dispatch(updateLastMessage(newMessage, channelIndex));
-		dispatch(orderChannelsByTheLatestMessage(channelIndex));
+		dispatch(createNewMessage(message, newMessage, channelIndex));
 		setNewMessage('');
 		//The feature below is going to be implemented in the future
 		// if (checkWheatherUnique(channelIndex)) {
@@ -71,7 +72,7 @@ function MessengerInput(props) {
 			<div className="text-input">
 				<textarea 
 				onKeyUp={ (event) => { if (event.key === 'Enter' && !event.shiftKey) {
-					handlerSend(event)
+					handlerSend()
 				}}}
 				onChange={onChangeHandler} 
 				placeholder="Write your message" 
